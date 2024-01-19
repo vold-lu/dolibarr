@@ -15,5 +15,5 @@
 
 
 -- BEGIN MODULEBUILDER INDEXES
-ALTER TABLE llx_bookcal_availabilities_extrafields ADD INDEX idx_availabilities_fk_object(fk_object);
+ALTER TABLE llx_bookcal_availabilities_extrafields ADD UNIQUE INDEX uk_availabilities_fk_object(fk_object);
 -- END MODULEBUILDER INDEXES

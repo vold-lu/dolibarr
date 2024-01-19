@@ -15,5 +15,5 @@
 
 
 -- BEGIN MODULEBUILDER INDEXES
-ALTER TABLE llx_stocktransfer_stocktransfer_extrafields ADD INDEX idx_fk_object(fk_object);
+ALTER TABLE llx_stocktransfer_stocktransfer_extrafields ADD UNIQUE INDEX uk_fk_object(fk_object);
 -- END MODULEBUILDER INDEXES

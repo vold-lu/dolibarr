@@ -17,4 +17,4 @@
 -- ===================================================================
 
 
-ALTER TABLE llx_partnership_extrafields ADD INDEX idx_partnership_extrafields (fk_object);
+ALTER TABLE llx_partnership_extrafields ADD UNIQUE INDEX uk_partnership_extrafields (fk_object);
