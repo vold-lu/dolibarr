@@ -594,7 +594,7 @@ if ($id > 0 || !empty($ref)) {
 
 		if ($action == 'close') {
 			$formquestion = array(
-				'text' => $langs->trans("ConfirmClose"),
+				'text' => $langs->trans("ConfirmClosed"),
 			);
 			print $form->formconfirm($_SERVER["PHP_SELF"]."?id=".$object->id, $langs->trans("ToClose"), $langs->trans("ConfirmCloseTask"), "confirm_close", $formquestion, '', 1, 300, 590);
 		}
