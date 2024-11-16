@@ -701,6 +701,7 @@ function projectLinesa(&$inc, $parent, &$lines, &$level, $var, $showproject, &$t
 				$taskstatic->duration_effective = $lines[$i]->duration_effective;
 				$taskstatic->budget_amount = $lines[$i]->budget_amount;
 				$taskstatic->billable = $lines[$i]->billable;
+				$taskstatic->status = $lines[$i]->status;
 				$taskstatic->fk_statut = $lines[$i]->fk_statut;
 
 				// Action column
@@ -957,7 +958,7 @@ function projectLinesa(&$inc, $parent, &$lines, &$level, $var, $showproject, &$t
 				// Status
 				if (count($arrayfields) > 0 && !empty($arrayfields['t.fk_statut']['checked'])) {
 					print '<td class="center">';
-					print $taskstatic->getLibStatut(5);
+					print $taskstatic->getLibStatut(4);
 					print '</td>';
 				}
 

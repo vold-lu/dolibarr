@@ -1091,6 +1091,7 @@ if ($action == 'create' && $user->hasRight('projet', 'creer') && (empty($object-
 	}
 	if (!empty($arrayfields['t.fk_statut']['checked'])) {
 		print '<td class="liste_titre center">';
+		//TODO: add status filter
 		print '</td>';
 	}
 

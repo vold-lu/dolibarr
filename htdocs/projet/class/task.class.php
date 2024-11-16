@@ -2498,12 +2498,12 @@ class Task extends CommonObjectLine
 		$this->labelStatus[0] = 'Draft';
 		$this->labelStatus[1] = 'ToDo';
 		$this->labelStatus[2] = 'Running';
-		$this->labelStatus[3] = 'Finish';
+		$this->labelStatus[3] = 'Closed';
 		$this->labelStatus[4] = 'Transfered';
 		$this->labelStatusShort[0] = 'Draft';
 		$this->labelStatusShort[1] = 'ToDo';
 		$this->labelStatusShort[2] = 'Running';
-		$this->labelStatusShort[3] = 'Completed';
+		$this->labelStatusShort[3] = 'Closed';
 		$this->labelStatusShort[4] = 'Transfered';
 
 		if ($mode == 0) {
@@ -2540,17 +2540,17 @@ class Task extends CommonObjectLine
 			}
 		} elseif ($mode == 4) {
 			if ($status == 0) {
-				return img_picto($langs->trans($this->labelStatusShort[$status]), 'statut0').' '.$langs->trans($this->labelStatus[$status]);
+				return dolGetStatus($langs->trans($this->labelStatus[$status]), $langs->trans($this->labelStatusShort[$status]), '', 'status0', $mode);
 			} elseif ($status == 1) {
-				return img_picto($langs->trans($this->labelStatusShort[$status]), 'statut1').' '.$langs->trans($this->labelStatus[$status]);
+				return dolGetStatus($langs->trans($this->labelStatus[$status]), $langs->trans($this->labelStatusShort[$status]), '', 'status1', $mode);
 			} elseif ($status == 2) {
-				return img_picto($langs->trans($this->labelStatusShort[$status]), 'statut3').' '.$langs->trans($this->labelStatus[$status]);
+				return dolGetStatus($langs->trans($this->labelStatus[$status]), $langs->trans($this->labelStatusShort[$status]), '', 'status2', $mode);
 			} elseif ($status == 3) {
-				return img_picto($langs->trans($this->labelStatusShort[$status]), 'statut6').' '.$langs->trans($this->labelStatus[$status]);
+				return dolGetStatus($langs->trans($this->labelStatus[$status]), $langs->trans($this->labelStatusShort[$status]), '', 'status3', $mode);
 			} elseif ($status == 4) {
-				return img_picto($langs->trans($this->labelStatusShort[$status]), 'statut6').' '.$langs->trans($this->labelStatus[$status]);
+				return dolGetStatus($langs->trans($this->labelStatus[$status]), $langs->trans($this->labelStatusShort[$status]), '', 'status4', $mode);
 			} elseif ($status == 5) {
-				return img_picto($langs->trans($this->labelStatusShort[$status]), 'statut5').' '.$langs->trans($this->labelStatus[$status]);
+				return dolGetStatus($langs->trans($this->labelStatus[$status]), $langs->trans($this->labelStatusShort[$status]), '', 'status5', $mode);
 			}
 		} elseif ($mode == 5) {
 			/*if ($status==0) return $langs->trans($this->labelStatusShort[$status]).' '.img_picto($langs->trans($this->labelStatusShort[$status]),'statut0');
