@@ -701,6 +701,7 @@ function projectLinesa(&$inc, $parent, &$lines, &$level, $var, $showproject, &$t
 				$taskstatic->duration_effective = $lines[$i]->duration_effective;
 				$taskstatic->budget_amount = $lines[$i]->budget_amount;
 				$taskstatic->billable = $lines[$i]->billable;
+				$taskstatic->fk_statut = $lines[$i]->fk_statut;
 
 				// Action column
 				if (getDolGlobalString('MAIN_CHECKBOX_LEFT_COLUMN')) {
@@ -950,6 +951,13 @@ function projectLinesa(&$inc, $parent, &$lines, &$level, $var, $showproject, &$t
 					} else {
 						print '<span>'.$langs->trans('No').'</span>';
 					}
+					print '</td>';
+				}
+
+				// Status
+				if (count($arrayfields) > 0 && !empty($arrayfields['t.fk_statut']['checked'])) {
+					print '<td class="center">';
+					print $taskstatic->getLibStatut(5);
 					print '</td>';
 				}
 

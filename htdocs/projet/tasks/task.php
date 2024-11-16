@@ -208,6 +208,19 @@ if ($action == 'confirm_delete' && $confirm == "yes" && $user->hasRight('projet'
 	}
 }
 
+if ($action == 'confirm_close' && $confirm == "yes" && $user->hasRight('projet', 'creer')) {
+	$result = $projectstatic->fetch($object->fk_project);
+	$projectstatic->fetch_thirdparty();
+
+	if ($object->close($user) > 0) {
+		header('Location: '.DOL_URL_ROOT.'/projet/tasks.php?restore_lastsearch_values=1&id='.$projectstatic->id.($withproject ? '&withproject=1' : ''));
+		exit;
+	} else {
+		setEventMessages($object->error, $object->errors, 'errors');
+		$action = '';
+	}
+}
+
 // Retrieve First Task ID of Project if withprojet is on to allow project prev next to work
 if (!empty($project_ref) && !empty($withproject)) {
 	if ($projectstatic->fetch(0, $project_ref) > 0) {
@@ -579,6 +592,14 @@ if ($id > 0 || !empty($ref)) {
 			print $form->formconfirm($_SERVER["PHP_SELF"]."?id=".$object->id, $langs->trans("ToClone"), $langs->trans("ConfirmCloneTask"), "confirm_clone", $formquestion, '', 1, 300, 590);
 		}
 
+		if ($action == 'close') {
+			$formquestion = array(
+				'text' => $langs->trans("ConfirmClose"),
+			);
+			print $form->formconfirm($_SERVER["PHP_SELF"]."?id=".$object->id, $langs->trans("ToClose"), $langs->trans("ConfirmCloseTask"), "confirm_close", $formquestion, '', 1, 300, 590);
+		}
+
+
 		if ($action == 'merge') {
 			$formquestion = array(
 				array(
@@ -701,6 +722,7 @@ if ($id > 0 || !empty($ref)) {
 		print '<span>'.($object->billable ? $langs->trans('Yes') : $langs->trans('No')).'</span>';
 		print '</td></tr>';
 
+
 		// Other attributes
 		$cols = 3;
 		$parameters = array('socid' => $socid);
@@ -730,11 +752,16 @@ if ($id > 0 || !empty($ref)) {
 		if (empty($reshook)) {
 			// Modify
 			if ($user->hasRight('projet', 'creer')) {
-				print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=edit&token='.newToken().'&withproject='.((int) $withproject).'">'.$langs->trans('Modify').'</a>';
+				if ($object->fk_statut != $object::STATUS_CLOSED)
+					print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=edit&token='.newToken().'&withproject='.((int) $withproject).'">'.$langs->trans('Modify').'</a>';
 				print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=clone&token='.newToken().'&withproject='.((int) $withproject).'">'.$langs->trans('Clone').'</a>';
 				print '<a class="butActionDelete classfortooltip" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=merge&token='.newToken().'&withproject='.((int) $withproject).'" title="'.$langs->trans("MergeTasks").'">'.$langs->trans('Merge').'</a>';
+
+				if ($object->fk_statut != $object::STATUS_CLOSED)
+				print '<a class="butAction classfortooltip" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=close&token='.newToken().'&withproject='.((int) $withproject).'" title="'.$langs->trans("Close").'">'.$langs->trans('Close').'</a>';
 			} else {
 				print '<a class="butActionRefused classfortooltip" href="#" title="'.$langs->trans("NotAllowed").'">'.$langs->trans('Modify').'</a>';
+
 			}
 
 			// Delete
