@@ -60,7 +60,58 @@ $documentation->showSidebar(); ?>
 			<!-- Summary -->
 			<?php $documentation->showSummary(); ?>
 
-			<!-- Basic usage -->
+
+			<!-- List of usage font awesome icon -->
+			<div class="documentation-section" id="img-picto-section-list">
+
+				<?php
+
+				$iconFileName = 'shims.json';
+				$iconFilePath = DOL_DOCUMENT_ROOT . '/theme/common/fontawesome-5/metadata';
+
+				$fontAwesomeIconRaw = file_get_contents($iconFilePath. '/' .$iconFileName);
+				if ($fontAwesomeIconRaw === false) {
+					dol_print_error($db, 'Error missing file  '. $iconFilePath . '/' . $iconFileName);
+				}
+
+				$fontAwesomeIcons = json_decode($fontAwesomeIconRaw);
+				if ($fontAwesomeIcons === null) {
+					dol_print_error($db, 'Error decoding '. $iconFilePath . '/' . $iconFileName);
+				}
+				?>
+
+				<h2 class="documentation-title"><?php echo $langs->trans('DocIconsList'); ?></h2>
+				<?php /* <p class="documentation-text"><?php echo $langs->trans('DocDocIconsListDescription'); ?></p>*/ ?>
+				<div class="documentation-example">
+					<div class="documentation-fontawesome-icon-list">
+						<?php
+						foreach (getImgPictoNameList() as $iconName) {
+							$labelAlt = 'Text on title tag for tooltip';
+							$iconCode =  img_picto($iconName, $iconName);
+							print '<div class="info-box ">
+									<span class="info-box-icon bg-infobox-expensereport">
+										'.$iconCode.'
+									</span>
+									<div class="info-box-content">
+										<div class="info-box-title" >'. $iconName .'</div>
+										<div class="info-box-lines">
+											<div class="info-box-line spanoverflow nowrap">
+												<div class="inline-block nowraponall">
+													<div class="documentation-code"><pre>'.dol_htmlentities('img_picto(\''.$labelAlt.'\', '.$iconName.')').'</pre></div>
+												</div>
+											</div>
+										</div><!-- /.info-box-lines -->
+									</div><!-- /.info-box-content -->
+								</div>';
+						}
+						?>
+					</div>
+				</div>
+			</div>
+			<!--  -->
+
+
+			<!-- List of usage font awesome icon -->
 			<div class="documentation-section" id="icon-section-list">
 
 				<?php
@@ -81,8 +132,6 @@ $documentation->showSidebar(); ?>
 
 				<h2 class="documentation-title"><?php echo $langs->trans('DocIconsList'); ?></h2>
 				<?php /* <p class="documentation-text"><?php echo $langs->trans('DocDocIconsListDescription'); ?></p>*/ ?>
-
-
 				<div class="documentation-example">
 
 					<div class="documentation-fontawesome-icon-list">
