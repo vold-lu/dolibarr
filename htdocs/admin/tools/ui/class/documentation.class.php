@@ -126,6 +126,12 @@ class Documentation
 						'DocButtonSubmenu' => '#buttonsection-submenu',
 					),
 				),
+				'Icons' => array(
+					'url' => dol_buildpath($baseUrl.'/components/icons.php', 1),
+					'icon' => 'far fa-flag pictofixedwidth',
+					'submenu' => array(),
+					'summary' => array(),
+				),
 				'Progress' => array(
 					'url' => dol_buildpath($baseUrl.'/components/progress-bars.php', 1),
 					'icon' => 'fas fa-battery-half pictofixedwidth',
