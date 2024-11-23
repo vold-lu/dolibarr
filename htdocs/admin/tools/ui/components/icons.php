@@ -88,6 +88,7 @@ $documentation->showSidebar(); ?>
 					<div class="documentation-fontawesome-icon-list">
 
 					<?php
+					$alreadyDisplay = [];
 					if ($fontAwesomeIcons && is_array($fontAwesomeIcons)) {
 						foreach ($fontAwesomeIcons as $iconData) {
 							$class= $iconData[1]??'fa';
@@ -97,6 +98,11 @@ $documentation->showSidebar(); ?>
 								$class.= ' fa-'.$iconData[0]??'';
 							}
 
+							if (in_array($class, $alreadyDisplay)) {
+								continue;
+							}
+
+							$alreadyDisplay[] = $class;
 							$iconCode =  '<span class="'.$class.'" ></span>';
 
 
