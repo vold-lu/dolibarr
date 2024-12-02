@@ -307,7 +307,6 @@ if (empty($reshook)) {
 		$search_categ_sup = 0;
 		$filter = '';
 		$option = '';
-		$socid = "";
 	}
 
 	// Mass actions
