@@ -1339,8 +1339,12 @@ if (empty($reshook)) {
 								}
 
 								$tva_tx = $lines[$i]->tva_tx;
+<<<<<<< HEAD
 								// @phan-suppress-next-line PhanTypeMismatchArgumentInternal
 								if (!empty($lines[$i]->vat_src_code) && !preg_match('/\(/', $tva_tx)) {
+=======
+								if (!empty($lines[$i]->vat_src_code) && !preg_match('/\(/', (string) $tva_tx)) {
+>>>>>>> branch '20.0' of git@github.com:Dolibarr/dolibarr.git
 									$tva_tx .= ' ('.$lines[$i]->vat_src_code.')';
 								}
 

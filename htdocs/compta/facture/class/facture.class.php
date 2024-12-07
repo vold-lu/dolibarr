@@ -862,16 +862,17 @@ class Facture extends CommonInvoice
 							1
 						);
 
+						if ($result < 0) {
+							$this->error = $newinvoiceline->error;
+							$this->errors = array_merge($this->errors, $newinvoiceline->errors);
+							$error++;
+							break;
+						}
+
 						// Defined the new fk_parent_line
 						if ($result > 0 && $newinvoiceline->product_type == 9) {
 							$fk_parent_line = $result;
 						}
-					}
-					if ($result < 0) {
-						$this->error = $newinvoiceline->error;
-						$this->errors = $newinvoiceline->errors;
-						$error++;
-						break;
 					}
 				}
 			} elseif (!$error && empty($this->fac_rec)) { 		// If this->lines is an array of invoice line arrays
