@@ -2630,7 +2630,7 @@ class Form
 	 *  @param		array<string,string|string[]>	$ajaxoptions			Options for ajax_autocompleter
 	 *  @param      int			$socid					Thirdparty Id (to get also price dedicated to this customer)
 	 *  @param		string|int<0,1>	$showempty			'' to not show empty line. Translation key to show an empty line. '1' show empty line with no text.
-	 * 	@param		int			$forcecombo				Force to use combo box
+	 * 	@param		int			$forcecombo				Force to use combo box.
 	 *  @param      string      $morecss                Add more css on select
 	 *  @param      int<0,1>	$hidepriceinlabel       1=Hide prices in label
 	 *  @param      string      $warehouseStatus        Warehouse status filter to count the quantity in stock. Following comma separated filter options can be used
@@ -2641,7 +2641,6 @@ class Form
 	 *  @param		int<0,1> 	$nooutput				No print if 1, return the output into a string
 	 *  @param		int<-1,1>	$status_purchase		Purchase status: -1=No filter on purchase status, 0=Products not on purchase, 1=Products on purchase
 	 *  @param		int 		$warehouseId 			Filter by Warehouses Id where there is real stock
-	 *
 	 *  @return		void|string
 	 */
 	public function select_produits($selected = 0, $htmlname = 'productid', $filtertype = '', $limit = 0, $price_level = 0, $status = 1, $finished = 2, $selected_input_value = '', $hidelabel = 0, $ajaxoptions = array(), $socid = 0, $showempty = '1', $forcecombo = 0, $morecss = '', $hidepriceinlabel = 0, $warehouseStatus = '', $selected_combinations = null, $nooutput = 0, $status_purchase = -1, $warehouseId = 0)
@@ -2666,7 +2665,7 @@ class Form
 		}
 
 		if (!empty($conf->use_javascript_ajax) && getDolGlobalString('PRODUIT_USE_SEARCH_TO_SELECT')) {
-			$placeholder = '';
+			$placeholder = (is_numeric($showempty) ? '' : 'placeholder="'.dolPrintHTML($showempty).'"');
 
 			if ($selected && empty($selected_input_value)) {
 				require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
@@ -2688,6 +2687,7 @@ class Form
 			if ((int) $warehouseId > 0) {
 				$urloption .= '&warehouseid=' . (int) $warehouseId;
 			}
+
 			$out .= ajax_autocompleter((string) $selected, $htmlname, DOL_URL_ROOT . '/product/ajax/products.php', $urloption, getDolGlobalInt('PRODUIT_USE_SEARCH_TO_SELECT'), getDolGlobalInt('PRODUCT_SEARCH_AUTO_SELECT_IF_ONLY_ONE', 1), $ajaxoptions);
 
 			if (isModEnabled('variants') && is_array($selected_combinations)) {
@@ -2774,6 +2774,7 @@ class Form
 					$out .= img_picto($langs->trans("Search"), 'search');
 				}
 			}
+
 			$out .= '<input type="text" class="minwidth100' . ($morecss ? ' ' . $morecss : '') . '" name="search_' . $htmlname . '" id="search_' . $htmlname . '" value="' . $selected_input_value . '"' . $placeholder . ' ' . (getDolGlobalString('PRODUCT_SEARCH_AUTOFOCUS') ? 'autofocus' : '') . ' />';
 			if ($hidelabel == 3) {
 				$out .= img_picto($langs->trans("Search"), 'search');
@@ -2794,16 +2795,16 @@ class Form
 	/**
 	 *  Return list of BOM for customer in Ajax if Ajax activated or go to select_produits_list
 	 *
-	 * @param string	$selected Preselected BOM id
-	 * @param string	$htmlname Name of HTML select field (must be unique in page).
-	 * @param int		$limit Limit on number of returned lines
-	 * @param int		$status Sell status -1=Return all bom, 0=Draft BOM, 1=Validated BOM
-	 * @param int		$type type of the BOM (-1=Return all BOM, 0=Return disassemble BOM, 1=Return manufacturing BOM)
-	 * @param string|int<0,1>	$showempty	'' to not show empty line. Translation key to show an empty line. '1' show empty line with no text.
-	 * @param string	$morecss Add more css on select
-	 * @param string	$nooutput No print, return the output into a string
-	 * @param int		$forcecombo Force to use combo box
-	 * @param string[]	$TProducts Add filter on a defined product
+	 * @param string			$selected 		Preselected BOM id
+	 * @param string			$htmlname 		Name of HTML select field (must be unique in page).
+	 * @param int				$limit 			Limit on number of returned lines
+	 * @param int				$status 		Sell status -1=Return all bom, 0=Draft BOM, 1=Validated BOM
+	 * @param int				$type 			Type of the BOM (-1=Return all BOM, 0=Return disassemble BOM, 1=Return manufacturing BOM)
+	 * @param string|int<0,1>	$showempty		'' to not show empty line. Translation key to show an empty line. '1' show empty line with no text.
+	 * @param string			$morecss 		Add more css on select
+	 * @param string			$nooutput 		No print, return the output into a string
+	 * @param int				$forcecombo 	Force to use combo box
+	 * @param string[]			$TProducts 		Add filter on a defined product
 	 * @return void|string
 	 */
 	public function select_bom($selected = '', $htmlname = 'bom_id', $limit = 0, $status = 1, $type = 0, $showempty = '1', $morecss = '', $nooutput = '', $forcecombo = 0, $TProducts = [])
@@ -5138,7 +5139,7 @@ class Form
 
 		$out = '';
 
-		$langs->load("admin");
+		$langs->loadLangs(array("admin", "banks"));
 		$num = 0;
 
 		$sql = "SELECT rowid, label, bank, clos as status, currency_code";
@@ -5164,7 +5165,7 @@ class Form
 				if ($status == 0) {
 					$out .= '<option class="opacitymedium" value="-1">' . $langs->trans("NoActiveBankAccountDefined") . '</span>';
 				} else {
-					$out .= '<option class="opacitymedium" value="-1">' . $langs->trans("NoBankAccountFound") . '</span>';
+					$out .= '<option class="opacitymedium" value="-1">' . $langs->trans("NoBankAccountDefined") . '</span>';
 				}
 			} else {
 				if (!empty($useempty) && !is_numeric($useempty)) {
@@ -5214,7 +5215,7 @@ class Form
 	}
 
 	/**
-	 *  Return a HTML select list of bank accounts customer
+	 * Return a HTML select list of bank accounts customer
 	 *
 	 * @param int|''	 	$selected 		Id account preselected
 	 * @param string 		$htmlname 		Name of select zone
@@ -5233,12 +5234,12 @@ class Form
 
 		$out = '';
 
-		$langs->load("admin");
+		$langs->loadLangs(array("admin", "banks"));
 		$num = 0;
 
 		$sql = "SELECT rowid, label, bank, status, iban_prefix, bic";
 		$sql .= " FROM " . $this->db->prefix() . "societe_rib";
-		$sql.=  " WHERE 1=1";
+		$sql.=  " WHERE type = 'ban'";
 		if ($filtre) {	// TODO Support USF
 			$sql .= " AND " . $filtre;
 		}
@@ -5252,7 +5253,7 @@ class Form
 			$out .= '<select id="select' . $htmlname . '" class="flat selectbankaccount' . ($morecss ? ' ' . $morecss : '') . '" name="' . $htmlname . '"' . ($moreattrib ? ' ' . $moreattrib : '') . '>';
 
 			if ($num == 0) {
-				$out .= '<option class="opacitymedium" value="-1">' . $langs->trans("NoBankAccountFound") . '</span>';
+				$out .= '<option class="opacitymedium" value="-1">' . $langs->trans("NoBankAccountDefined") . '</span>';
 			} else {
 				if (!empty($useempty) && !is_numeric($useempty)) {
 					$out .= '<option value="-1">'.$langs->trans($useempty).'</option>';
@@ -7157,10 +7158,11 @@ class Form
 	 * @param string 				$labeladddateof Label to use for the $adddateof parameter. Deprecated. Used only when $adddateof is not an array.
 	 * @param string 				$placeholder 	Placeholder
 	 * @param 'auto'|'gmt'|'tzserver'|'tzuserrel'	$gm 	'auto' (for backward compatibility, avoid this), 'gmt' or 'tzserver' or 'tzuserrel'
+	 * @param string				$calendarpicto 	URL of the icon/image used to display the calendar
 	 * @return string               	         	Html for selectDate
 	 * @see    form_date(), select_month(), select_year(), select_dayofweek()
 	 */
-	public function selectDate($set_time = '', $prefix = 're', $h = 0, $m = 0, $empty = 0, $form_name = "", $d = 1, $addnowlink = 0, $disabled = 0, $fullday = '', $addplusone = '', $adddateof = '', $openinghours = '', $stepminutes = 1, $labeladddateof = '', $placeholder = '', $gm = 'auto')
+	public function selectDate($set_time = '', $prefix = 're', $h = 0, $m = 0, $empty = 0, $form_name = "", $d = 1, $addnowlink = 0, $disabled = 0, $fullday = '', $addplusone = '', $adddateof = '', $openinghours = '', $stepminutes = 1, $labeladddateof = '', $placeholder = '', $gm = 'auto', $calendarpicto = '')
 	{
 		global $conf, $langs;
 
@@ -7311,9 +7313,10 @@ class Form
 						}
 						// Note: We don't need monthNames, monthNamesShort, dayNames, dayNamesShort, dayNamesMin, they are set globally on datepicker component in lib_head.js.php
 						if (!getDolGlobalString('MAIN_POPUP_CALENDAR_ON_FOCUS')) {
+							$buttonImage = $calendarpicto ?: DOL_URL_ROOT . "/theme/" . dol_escape_js($conf->theme) . "/img/object_calendarday.png";
 							$retstring .= "
 								showOn: 'button',	/* both has problem with autocompletion */
-								buttonImage: '" . DOL_URL_ROOT . "/theme/" . dol_escape_js($conf->theme) . "/img/object_calendarday.png',
+								buttonImage: '" . $buttonImage . "',
 								buttonImageOnly: true";
 						}
 						$retstring .= "
@@ -11312,6 +11315,13 @@ class Form
 		</script>
 		';
 
+		// Convert $arrayoffiltercriterias into a json object that can be used in jquery to build the search component dynamically
+		$arrayoffiltercriterias_json = json_encode($arrayoffiltercriterias);
+		$ret .= '<script>
+			var arrayoffiltercriterias = ' . $arrayoffiltercriterias_json . ';
+		</script>';
+
+
 		$arrayoffilterfieldslabel = array();
 		foreach ($arrayoffiltercriterias as $key => $val) {
 			$arrayoffilterfieldslabel[$key]['label'] = $val['label'];
@@ -11355,6 +11365,19 @@ class Form
 		$ret .=  $form->selectDate(($dateOne ? $dateOne : -1), 'dateone', 0, 0, 1, '', 1, 0, 0, '', '', '', '', 1, '');
 		$ret .= '</span>';
 
+		// Value selector (will be populated dynamically) based on search_filter_field value if a selected value has an array of values
+		$ret .= '<select class="value-selector width150" id="value-selector" style="display:none">';
+		$ret .= '</select>';
+		$ret .= '<script>
+			$(document).ready(function() {
+				$("#value-selector").select2({
+					placeholder: "' . dol_escape_js($langs->trans('Value')) . '"
+				});
+				$("#value-selector").hide();
+				$("#value-selector").next(".select2-container").hide();
+			});
+		</script>';
+
 		$ret .= '</div>';
 
 		$ret .= '<div class="btn-div">';
@@ -11389,10 +11412,21 @@ class Form
 		$ret .= '<script>
 			$(document).ready(function() {
 				$(".search_filter_field").on("change", function() {
+					let maybenull = 0;
 					const selectedField = $(this).find(":selected");
-					const fieldType = selectedField.data("type");
+					let fieldType = selectedField.data("type");
 					const selectedFieldValue = selectedField.val();
-					const operators = getOperatorsForFieldType(fieldType);
+
+					// If the selected field has an array of values then ask toshow the value selector instead of the value input
+					if (arrayoffiltercriterias[selectedFieldValue]["arrayofkeyval"] !== undefined) {
+						fieldType = "select";
+					}
+
+					// If the selected field may be null then ask to append the "IsDefined" and "IsNotDefined" operators
+					if (arrayoffiltercriterias[selectedFieldValue]["maybenull"] !== undefined) {
+						maybenull = 1;
+					}
+					const operators = getOperatorsForFieldType(fieldType, maybenull);
 					const operatorSelector = $(".operator-selector");
 
 					// Clear existing options
@@ -11410,11 +11444,44 @@ class Form
 					$("#datemonth, #dateyear").val(null).trigger("change.select2");
 					$("#dateone").datepicker("setDate", null);
 					$(".date-one, .date-month, .date-year").hide();
+					$("#value-selector").val("").hide();
+					$("#value-selector").next(".select2-container").hide();
+					$("#value-selector").val(null).trigger("change.select2");
 
 					if (fieldType === "date" || fieldType === "datetime" || fieldType === "timestamp") {
 						$(".date-one").show();
+					} else if (arrayoffiltercriterias[selectedFieldValue]["arrayofkeyval"] !== undefined) {
+						var arrayofkeyval = arrayoffiltercriterias[selectedFieldValue]["arrayofkeyval"];
+						var valueSelector = $("#value-selector");
+						valueSelector.empty();
+						Object.entries(arrayofkeyval).forEach(function([key, val]) {
+							valueSelector.append("<option value=\'" + key + "\'>" + val + "</option>");
+						});
+						valueSelector.trigger("change.select2");
+
+						$("#value-selector").show();
+						$("#value-selector").next(".select2-container").show();
 					} else {
 						$(".value-input").show();
+					}
+				});
+
+				$("#operator-selector").on("change", function() {
+					const selectedOperator = $(this).find(":selected").val();
+					if (selectedOperator === "IsDefined" || selectedOperator === "IsNotDefined") {
+						// Disable all value input elements
+						$(".value-input, .dateone, .datemonth, .dateyear").val("").prop("disabled", true);
+						$("#datemonth, #dateyear").val(null).trigger("change.select2");
+						$("#dateone").datepicker("setDate", null).datepicker("option", "disabled", true);
+						$(".date-one, .date-month, .date-year").prop("disabled", true);
+						$("#value-selector").val("").prop("disabled", true);
+						$("#value-selector").val(null).trigger("change.select2");
+					} else {
+					 	// Enable all value input elements
+						$(".value-input, .dateone, .datemonth, .dateyear").prop("disabled", false);
+						$(".date-one, .date-month, .date-year").prop("disabled", false);
+						$("#dateone").datepicker("option", "disabled", false);
+						$("#value-selector").prop("disabled", false);
 					}
 				});
 
@@ -11435,6 +11502,17 @@ class Form
 							value = `${year}-${month}-${day}`;
 						}
 					}
+
+					// If the selected field has an array of values then take the selected value
+					if (arrayoffiltercriterias[field]["arrayofkeyval"] !== undefined) {
+						value = $("#value-selector").val();
+					}
+
+					// If the operator is "IsDefined" or "IsNotDefined" then set the value to 1 (it will not be used)
+					if (operator === "IsDefined" || operator === "IsNotDefined") {
+						value = "1";
+					}
+
 					const filterString = generateFilterString(field, operator, value, fieldType);
 
 					// Submit the form
