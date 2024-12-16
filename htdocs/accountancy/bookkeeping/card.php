@@ -528,7 +528,7 @@ if ($action == 'create') {
 
 		$head = array();
 		$h = 0;
-		$head[$h][0] = DOL_URL_ROOT."/accountancy/bookkeeping/card.php".'?piece_num='.((int) $object->piece_num).($mode ? '&mode='.$mode : '').($type ? '&type='.$type : '').($backtopage ? '&backtopage='.urlencode($backtopage) : '');
+		$head[$h][0] = DOL_URL_ROOT."/accountancy/bookkeeping/card.php".'?piece_num='.((int) $object->piece_num).($mode ? '&mode='.$mode : '').($type ? '&type='.$type : '').'&backtopage='.urlencode($backtopage);
 		$head[$h][1] = $langs->trans("Transaction");
 		$head[$h][2] = 'transaction';
 		$h++;
