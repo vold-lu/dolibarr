@@ -4760,7 +4760,6 @@ ul.noborder li:nth-child(odd):not(.liste_titre) {
 	-webkit-box-shadow: unset;
 }
 .oddeven:hover:not(.nohover), .evenodd:hover:not(.nohover), .oddevenimport:hover:not(.nohover), .evenoddimport:hover:not(.nohover), .impair:hover:not(.nohover), .pair:hover:not(.nohover) {
-{
 	background: rgb(<?php echo $colorbacklinepairhover; ?>) !important;
 }
 

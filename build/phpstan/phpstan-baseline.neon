@@ -1177,18 +1177,6 @@ parameters:
 			path: ../../htdocs/admin/agenda.php
 
 		-
-			message: '#^Variable \$label might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
-			path: ../../htdocs/admin/agenda_other.php
-
-		-
-			message: '#^Variable \$label might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
-			path: ../../htdocs/admin/agenda_reminder.php
-
-		-
 			message: '#^Variable \$errorsaved in empty\(\) always exists and is always falsy\.$#'
 			identifier: empty.variable
 			count: 1
@@ -1732,18 +1720,6 @@ parameters:
 			message: '#^Call to function function_exists\(\) with ''exec''\|''popen'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
-			path: ../../htdocs/admin/system/security.php
-
-		-
-			message: '#^Variable \$arrayofstreamtodisable might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../htdocs/admin/system/security.php
-
-		-
-			message: '#^Variable \$conffile might not be defined\.$#'
-			identifier: variable.undefined
-			count: 4
 			path: ../../htdocs/admin/system/security.php
 
 		-
@@ -2563,40 +2539,10 @@ parameters:
 			path: ../../htdocs/asset/tpl/depreciation_options_view.tpl.php
 
 		-
-			message: '#^Variable \$langs might not be defined\.$#'
-			identifier: variable.undefined
-			count: 7
-			path: ../../htdocs/asset/tpl/depreciation_options_view.tpl.php
-
-		-
 			message: '#^Variable \$parameters might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
 			path: ../../htdocs/asset/tpl/depreciation_options_view.tpl.php
-
-		-
-			message: '#^Unable to resolve the template type T in call to function dol_sort_array$#'
-			identifier: argument.templateType
-			count: 1
-			path: ../../htdocs/asset/tpl/depreciation_view.tpl.php
-
-		-
-			message: '#^Variable \$assetdepreciationoptions might not be defined\.$#'
-			identifier: variable.undefined
-			count: 7
-			path: ../../htdocs/asset/tpl/depreciation_view.tpl.php
-
-		-
-			message: '#^Variable \$db might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../htdocs/asset/tpl/depreciation_view.tpl.php
-
-		-
-			message: '#^Variable \$langs might not be defined\.$#'
-			identifier: variable.undefined
-			count: 7
-			path: ../../htdocs/asset/tpl/depreciation_view.tpl.php
 
 		-
 			message: '#^Variable \$parameters might not be defined\.$#'
@@ -2851,67 +2797,7 @@ parameters:
 			path: ../../htdocs/bom/tpl/objectline_edit.tpl.php
 
 		-
-			message: '#^Cannot access property \$db on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: ../../htdocs/bom/tpl/objectline_edit.tpl.php
-
-		-
-			message: '#^Variable \$action might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../htdocs/bom/tpl/objectline_edit.tpl.php
-
-		-
-			message: '#^Variable \$buyer might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../htdocs/bom/tpl/objectline_edit.tpl.php
-
-		-
 			message: '#^Variable \$dateSelector might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../htdocs/bom/tpl/objectline_edit.tpl.php
-
-		-
-			message: '#^Variable \$hookmanager might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../htdocs/bom/tpl/objectline_edit.tpl.php
-
-		-
-			message: '#^Variable \$i might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../htdocs/bom/tpl/objectline_edit.tpl.php
-
-		-
-			message: '#^Variable \$langs might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
-			path: ../../htdocs/bom/tpl/objectline_edit.tpl.php
-
-		-
-			message: '#^Variable \$line might not be defined\.$#'
-			identifier: variable.undefined
-			count: 20
-			path: ../../htdocs/bom/tpl/objectline_edit.tpl.php
-
-		-
-			message: '#^Variable \$seller might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../htdocs/bom/tpl/objectline_edit.tpl.php
-
-		-
-			message: '#^Variable \$this might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
-			path: ../../htdocs/bom/tpl/objectline_edit.tpl.php
-
-		-
-			message: '#^Variable \$var might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
 			path: ../../htdocs/bom/tpl/objectline_edit.tpl.php
@@ -2926,12 +2812,6 @@ parameters:
 			message: '#^Property CommonDict\:\:\$label \(string\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
 			count: 1
-			path: ../../htdocs/bom/tpl/objectline_view.tpl.php
-
-		-
-			message: '#^Variable \$action might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
 			path: ../../htdocs/bom/tpl/objectline_view.tpl.php
 
 		-
@@ -7409,60 +7289,6 @@ parameters:
 			identifier: variable.undefined
 			count: 1
 			path: ../../htdocs/contact/ajax/contact.php
-
-		-
-			message: '#^Cannot access property \$control on mixed\.$#'
-			identifier: property.nonObject
-			count: 24
-			path: ../../htdocs/contact/canvas/default/tpl/contactcard_create.tpl.php
-
-		-
-			message: '#^Variable \$canvas might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../htdocs/contact/canvas/default/tpl/contactcard_create.tpl.php
-
-		-
-			message: '#^Variable \$this might not be defined\.$#'
-			identifier: variable.undefined
-			count: 24
-			path: ../../htdocs/contact/canvas/default/tpl/contactcard_create.tpl.php
-
-		-
-			message: '#^Cannot access property \$control on mixed\.$#'
-			identifier: property.nonObject
-			count: 31
-			path: ../../htdocs/contact/canvas/default/tpl/contactcard_edit.tpl.php
-
-		-
-			message: '#^Variable \$canvas might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../htdocs/contact/canvas/default/tpl/contactcard_edit.tpl.php
-
-		-
-			message: '#^Variable \$this might not be defined\.$#'
-			identifier: variable.undefined
-			count: 29
-			path: ../../htdocs/contact/canvas/default/tpl/contactcard_edit.tpl.php
-
-		-
-			message: '#^Cannot access property \$control on mixed\.$#'
-			identifier: property.nonObject
-			count: 34
-			path: ../../htdocs/contact/canvas/default/tpl/contactcard_view.tpl.php
-
-		-
-			message: '#^Variable \$canvas might not be defined\.$#'
-			identifier: variable.undefined
-			count: 3
-			path: ../../htdocs/contact/canvas/default/tpl/contactcard_view.tpl.php
-
-		-
-			message: '#^Variable \$this might not be defined\.$#'
-			identifier: variable.undefined
-			count: 32
-			path: ../../htdocs/contact/canvas/default/tpl/contactcard_view.tpl.php
 
 		-
 			message: '#^If condition is always true\.$#'
@@ -13990,12 +13816,6 @@ parameters:
 			message: '#^Comparison operation "\>" between 1 and 0 is always true\.$#'
 			identifier: greater.alwaysTrue
 			count: 2
-			path: ../../htdocs/core/modules/member/doc/pdf_standard_member.class.php
-
-		-
-			message: '#^Parameter \#1 \$substitutionarray of function complete_substitutions_array expects array\<string, string\>, array\<string, int\|string\> given\.$#'
-			identifier: argument.type
-			count: 1
 			path: ../../htdocs/core/modules/member/doc/pdf_standard_member.class.php
 
 		-
@@ -33088,12 +32908,6 @@ parameters:
 			message: '#^Unable to resolve the template type T in call to function dol_sort_array$#'
 			identifier: argument.templateType
 			count: 1
-			path: ../../htdocs/variants/list.php
-
-		-
-			message: '#^Variable \$rowid might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
 			path: ../../htdocs/variants/list.php
 
 		-

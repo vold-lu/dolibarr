@@ -139,7 +139,7 @@ class mod_supplier_payment_brodator extends ModeleNumRefSupplierPayments
 			return 0;
 		}
 
-		$numFinal = get_next_value($db, $mask, 'paiementfourn', 'ref', '', $objsoc, $object->datepaye);
+		$numFinal = get_next_value($db, $mask, 'paiementfourn', 'ref', '', $objsoc, is_object($object) ?$object->datepaye :'');
 
 		return  $numFinal;
 	}
