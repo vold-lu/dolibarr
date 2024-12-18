@@ -1025,7 +1025,7 @@ class ProductFournisseur extends Product
 						}
 					}
 
-					if ($fourn_unitprice < $min || $min == -1) {
+					if ($fourn_unitprice_with_discount < $min || $min == -1) {
 						$this->id                       = $prodid;
 						$this->product_fourn_price_id   = $record["product_fourn_price_id"];
 						$this->ref_supplier             = $record["ref_fourn"];
@@ -1050,7 +1050,7 @@ class ProductFournisseur extends Product
 						$this->fourn_multicurrency_id          = $record["fk_multicurrency"];
 						$this->fourn_multicurrency_code        = $record["multicurrency_code"];
 
-						$min = $fourn_unitprice;
+						$min = $fourn_unitprice_with_discount;
 					}
 				}
 			}

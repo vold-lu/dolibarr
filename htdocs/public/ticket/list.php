@@ -98,7 +98,6 @@ if (!isModEnabled('ticket')) {
 }
 
 
-
 /*
  * Actions
  */
