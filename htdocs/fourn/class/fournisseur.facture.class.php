@@ -423,6 +423,7 @@ class FactureFournisseur extends CommonInvoice
 			$this->fk_multicurrency = 0;
 			$this->multicurrency_tx = 1;
 		}
+		$this->entity = setEntity($this);
 
 		$this->db->begin();
 
@@ -577,7 +578,7 @@ class FactureFournisseur extends CommonInvoice
 		$sql .= "'(PROV)'";
 		$sql .= ", '".$this->db->escape($this->ref_supplier)."'";
 		$sql .= ", '".$this->db->escape($this->ref_ext)."'";
-		$sql .= ", ".((int) $conf->entity);
+		$sql .= ", ".((int) $this->entity);
 		$sql .= ", '".$this->db->escape($this->type)."'";
 		$sql .= ", ".((int) $this->subtype);
 		$sql .= ", '".$this->db->escape(isset($this->label) ? $this->label : (isset($this->libelle) ? $this->libelle : ''))."'";
@@ -732,6 +733,7 @@ class FactureFournisseur extends CommonInvoice
 			 */
 			if (! $error && $this->fac_rec > 0 && $_facrec instanceof FactureFournisseurRec) {
 				foreach ($_facrec->lines as $i => $val) {
+					$product_type = $_facrec->lines[$i]->product_type;
 					if ($_facrec->lines[$i]->fk_product) {
 						$prod = new Product($this->db);
 						$res = $prod->fetch($_facrec->lines[$i]->fk_product);
@@ -793,7 +795,7 @@ class FactureFournisseur extends CommonInvoice
 						0,
 						$_facrec->lines[$i]->info_bits,
 						'HT',
-						0,
+						$product_type,
 						$_facrec->lines[$i]->rang,
 						0,
 						$_facrec->lines[$i]->array_options,
@@ -3071,7 +3073,7 @@ class FactureFournisseur extends CommonInvoice
 		$xnbp = 0;
 		if (empty($option) || $option != 'nolines') {
 			// Lines
-			$nbp = 5;
+			$nbp = min(1000, GETPOSTINT('nblines') ? GETPOSTINT('nblines') : 5);	// We can force the nb of lines to test from command line (but not more than 1000)
 			while ($xnbp < $nbp) {
 				$line = new SupplierInvoiceLine($this->db);
 				$line->desc = $langs->trans("Description")." ".$xnbp;

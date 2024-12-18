@@ -99,10 +99,6 @@ class Reception extends CommonObject
 	 * @var int<0,1>
 	 */
 	public $billed;
-	/**
-	 * @var string
-	 */
-	public $model_pdf;
 
 	/**
 	 * @var int|float
@@ -651,8 +647,7 @@ class Reception extends CommonObject
 
 						if (intval($result) < 0) {
 							$error++;
-							$this->errors[] = $mouvS->error;
-							$this->errors = array_merge($this->errors, $mouvS->errors);
+							$this->setErrorsFromObject($mouvS);
 							break;
 						}
 					} else {
@@ -665,8 +660,7 @@ class Reception extends CommonObject
 
 						if (intval($result) < 0) {
 							$error++;
-							$this->errors[] = $mouvS->error;
-							$this->errors = array_merge($this->errors, $mouvS->errors);
+							$this->setErrorsFromObject($mouvS);
 							break;
 						}
 					}
@@ -813,8 +807,7 @@ class Reception extends CommonObject
 
 			$ret = $supplierorderdispatch->fetchAll('', '', 0, 0, $filter);
 			if ($ret < 0) {
-				$this->error = $supplierorderdispatch->error;
-				$this->errors = $supplierorderdispatch->errors;
+				$this->setErrorsFromObject($supplierorderdispatch);
 				return $ret;
 			} else {
 				// build array with quantity received by product in all supplier orders (origin)
@@ -899,8 +892,7 @@ class Reception extends CommonObject
 		$supplierorderline = new CommandeFournisseurLigne($this->db);
 		$result = $supplierorderline->fetch($id);
 		if ($result <= 0) {
-			$this->error = $supplierorderline->error;
-			$this->errors = $supplierorderline->errors;
+			$this->setErrorsFromObject($supplierorderline);
 			return -1;
 		}
 
@@ -1528,7 +1520,7 @@ class Reception extends CommonObject
 
 		$this->fk_incoterms = 1;
 
-		$nbp = 5;
+		$nbp = min(1000, GETPOSTINT('nblines') ? GETPOSTINT('nblines') : 5);	// We can force the nb of lines to test from command line (but not more than 1000)
 		$xnbp = 0;
 		while ($xnbp < $nbp) {
 			$line = new CommandeFournisseurDispatch($this->db);

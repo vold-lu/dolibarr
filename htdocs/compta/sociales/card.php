@@ -293,12 +293,13 @@ if (empty($reshook)) {
 				$object->date_ech = dol_time_plus_duree($object->date_ech, 1, 'm');
 			} else {
 				// Note date_ech is often a little bit higher than dateperiod
+				$newdateech = dol_mktime(0, 0, 0, GETPOSTINT('clone_date_echmonth'), GETPOSTINT('clone_date_echday'), GETPOSTINT('clone_date_echyear'));	// = date of creation or due date
 				$newdateperiod = dol_mktime(0, 0, 0, GETPOSTINT('clone_periodmonth'), GETPOSTINT('clone_periodday'), GETPOSTINT('clone_periodyear'));
-				$newdateech = dol_mktime(0, 0, 0, GETPOSTINT('clone_date_echmonth'), GETPOSTINT('clone_date_echday'), GETPOSTINT('clone_date_echyear'));
+
 				if ($newdateperiod) {
 					$object->period = $newdateperiod;
 					if (empty($newdateech)) {
-						$object->date_ech = $object->periode;
+						$object->date_ech = $object->period;
 					}
 				}
 				if ($newdateech) {
@@ -355,6 +356,8 @@ $now = dol_now();
 $title = $langs->trans("SocialContribution").' - '.$langs->trans("Card");
 $help_url = 'EN:Module_Taxes_and_social_contributions|FR:Module_Taxes_et_charges_spéciales|ES:M&oacute;dulo Impuestos y cargas sociales (IVA, impuestos)';
 llxHeader("", $title, $help_url);
+
+$reseapayer = 0;
 
 
 // Form to create a social contribution
