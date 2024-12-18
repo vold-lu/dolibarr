@@ -128,6 +128,11 @@ if ($action == 'update' && !GETPOST("cancel") && $user->hasRight('projet', 'cree
 		$object->progress = price2num(GETPOST('progress', 'alphanohtml'));
 		$object->budget_amount = GETPOSTFLOAT('budget_amount');
 		$object->billable = (GETPOST('billable', 'aZ') == 'yes' ? 1 : 0);
+		if (GETPOST('progress') == '100') {
+			$object->status = $object::STATUS_CLOSED;
+		} elseif (GETPOST('progress') != '0') {
+			$object->status = $object::STATUS_VALIDATED;
+		}
 
 		// Fill array 'array_options' with data from add form
 		$ret = $extrafields->setOptionalsFromPost(null, $object, '@GETPOSTISSET');

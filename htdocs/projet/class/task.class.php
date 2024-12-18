@@ -358,6 +358,11 @@ class Task extends CommonObjectLine
 	const STATUS_VALIDATED = 1;
 
 	/**
+	 * Ongoing status (In progress). Note: We also have the field progress to know the progression from 0 to 100%.
+	 */
+	const STATUS_ONGOING = 2;
+
+	/**
 	 * Finished status
 	 */
 	const STATUS_CLOSED = 3;
@@ -565,7 +570,6 @@ class Task extends CommonObjectLine
 				$this->date_end = $this->db->jdate($obj->date_end);
 				$this->fk_user_creat		= $obj->fk_user_creat;
 				$this->fk_user_valid		= $obj->fk_user_valid;
-				$this->fk_statut		    = $obj->status;
 				$this->status			    = $obj->status;
 				$this->progress				= $obj->progress;
 				$this->budget_amount		= $obj->budget_amount;
@@ -647,6 +651,10 @@ class Task extends CommonObjectLine
 			return -1;
 		}
 
+		if (isset($this->status)) {
+			$this->status = (int) $this->status;
+		}
+
 		// Check parameters
 		// Put here code to add control on parameters values
 
@@ -667,7 +675,8 @@ class Task extends CommonObjectLine
 		$sql .= " budget_amount=".(($this->budget_amount != '' && $this->budget_amount >= 0) ? $this->budget_amount : 'null').",";
 		$sql .= " rang=".((!empty($this->rang)) ? ((int) $this->rang) : "0").",";
 		$sql .= " priority=".((!empty($this->priority)) ? ((int) $this->priority) : "0").",";
-		$sql .= " billable=".((int) $this->billable);
+		$sql .= " billable=".((int) $this->billable).",";
+		$sql .= " fk_statut=".((int) $this->status);
 		$sql .= " WHERE rowid=".((int) $this->id);
 
 		$this->db->begin();
@@ -2497,12 +2506,12 @@ class Task extends CommonObjectLine
 		// list of Statut of the task
 		$this->labelStatus[0] = 'Draft';
 		$this->labelStatus[1] = 'ToDo';
-		$this->labelStatus[2] = 'Running';
+		$this->labelStatus[2] = 'In progress';
 		$this->labelStatus[3] = 'Closed';
 		$this->labelStatus[4] = 'Transfered';
 		$this->labelStatusShort[0] = 'Draft';
 		$this->labelStatusShort[1] = 'ToDo';
-		$this->labelStatusShort[2] = 'Running';
+		$this->labelStatusShort[2] = 'In progress';
 		$this->labelStatusShort[3] = 'Closed';
 		$this->labelStatusShort[4] = 'Transfered';
 
