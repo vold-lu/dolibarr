@@ -796,7 +796,7 @@ function checkPHPCode(&$phpfullcodestringold, &$phpfullcodestring)
 	if (!$error) {
 		if (preg_match('/\*\/\s*\(/ims', $phpfullcodestring)) {
 				$error++;
-				setEventMessages($langs->trans("DynamicPHPCodeContainsAForbiddenInstruction", $forbiddenphpmethod), null, 'errors');
+				setEventMessages($langs->trans("DynamicPHPCodeContainsAForbiddenInstruction", "exec/*...*/ ('ls')"), null, 'errors');
 		}
 	}
 
