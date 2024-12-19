@@ -53,9 +53,6 @@ parameters:
 	ignoreErrors:
 		- '#.*phan-var#'
 		- '#^Expression "''…" on a separate line does not do anything\.$#'
-		- '#is always true#'
-		- '#is always false#'
-		- '#will always evaluate to true#'
 	internalErrorsCountLimit: 50
 	cache:
 		# nodesByFileCountMax: 512

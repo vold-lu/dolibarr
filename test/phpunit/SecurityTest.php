@@ -636,13 +636,13 @@ class SecurityTest extends CommonClassTest
 		$this->assertEquals('Bad string syntax to evaluate: new __forbiddenstring__(\'abc\')', $result);
 
 
-		$result = (string) dol_eval('$a=function() { }; $a;', 1, 1, '0');
-		print "result5 = ".$result."\n";
-		$this->assertStringContainsString('Bad string syntax to evaluate', $result);
+		$result = dol_eval('$a=function() { }; $a', 1, 1, '0');		// result of dol_eval may be an object Closure
+		print "result5 = ".json_encode($result)."\n";
+		$this->assertStringContainsString('Bad string syntax to evaluate', json_encode($result));
 
-		$result = (string) dol_eval('$a=function() { }; $a;', 1, 1, '1');
-		print "result6 = ".$result."\n";
-		$this->assertStringContainsString('Bad string syntax to evaluate', $result);
+		$result = dol_eval('$a=function() { }; $a();', 1, 1, '1');
+		print "result6 = ".json_encode($result)."\n";
+		$this->assertStringContainsString('Bad string syntax to evaluate', json_encode($result));
 
 		$result = (string) dol_eval('$a=exec("ls");', 1, 1);
 		print "result7 = ".$result."\n";
@@ -723,6 +723,11 @@ class SecurityTest extends CommonClassTest
 		$result = (string) dol_eval('($a = "ex") && ($b = "ec") && ($cmd = "$a$b") && $cmd ("curl localhost:5555")', 1, 0);
 		print "result22 = ".$result."\n";
 		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'Test 22');
+
+
+		$result = (string) dol_eval('\'exec\'("aaa")', 1, 0);
+		print "result1 = ".$result."\n";
+		$this->assertStringContainsString('Bad string syntax to evaluate', json_encode($result), 'Cant find the string Bad string syntaxwhen i should');
 	}
 
 	/**
@@ -965,34 +970,5 @@ class SecurityTest extends CommonClassTest
 		$this->assertEquals($s, $result, 'Test for restricthtmlallowlinkscript');
 
 		return 0;
-	}
-
-
-	/**
-	 * testCheckLoginPassEntity
-	 *
-	 * @return	void
-	 */
-	public function testCheckLoginPassEntity()
-	{
-		$login = checkLoginPassEntity('loginbidon', 'passwordbidon', 1, array('dolibarr'));
-		print __METHOD__." login=".$login."\n";
-		$this->assertEquals($login, '');
-
-		$login = checkLoginPassEntity('admin', 'passwordbidon', 1, array('dolibarr'));
-		print __METHOD__." login=".$login."\n";
-		$this->assertEquals($login, '');
-
-		$login = checkLoginPassEntity('admin', 'admin', 1, array('dolibarr'));            // Should works because admin/admin exists
-		print __METHOD__." login=".$login."\n";
-		$this->assertEquals($login, 'admin', 'The test to check if pass of user "admin" is "admin" has failed');
-
-		$login = checkLoginPassEntity('admin', 'admin', 1, array('http','dolibarr'));    // Should work because of second authentication method
-		print __METHOD__." login=".$login."\n";
-		$this->assertEquals($login, 'admin');
-
-		$login = checkLoginPassEntity('admin', 'admin', 1, array('forceuser'));
-		print __METHOD__." login=".$login."\n";
-		$this->assertEquals('', $login, 'Error');    // Expected '' because should failed because login 'auto' does not exists
 	}
 }

@@ -69,7 +69,7 @@ class BookKeeping extends CommonObject
 	public $doc_date;
 
 	/**
-	 * @var int 	Deadline for payment
+	 * @var int|null|'' 	Deadline for payment
 	 */
 	public $date_lim_reglement;
 
@@ -2926,7 +2926,7 @@ class BookKeeping extends CommonObject
 								$result = $this->db->query($sql);
 								if (!$result) {
 									$this->errors[] = 'Error: ' . $this->db->lasterror();
-									dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
+									dol_syslog(__METHOD__ . ' ' . implode(',', $this->errors), LOG_ERR);
 									$error++;
 								}
 								$objtmp = $this->db->fetch_object($result);
@@ -2938,7 +2938,7 @@ class BookKeeping extends CommonObject
 
 							$bookkeeping->numero_compte = $obj->numero_compte;
 							$accountingaccount = new AccountingAccount($this->db);
-							$accountingaccount->fetch('', $obj->numero_compte);
+							$accountingaccount->fetch(0, $obj->numero_compte);
 							$bookkeeping->label_compte = $accountingaccount->label; // latest account label used
 
 							$bookkeeping->label_operation = $new_fiscal_period->label;
@@ -2953,8 +2953,7 @@ class BookKeeping extends CommonObject
 
 							$result = $bookkeeping->create($user);
 							if ($result < 0) {
-								$this->error = $bookkeeping->error;
-								$this->errors = $bookkeeping->errors;
+								$this->setErrorsFromObject($bookkeeping);
 								$error++;
 								break;
 							}
@@ -2990,7 +2989,7 @@ class BookKeeping extends CommonObject
 							$result = $this->db->query($sql);
 							if (!$result) {
 								$this->errors[] = 'Error: ' . $this->db->lasterror();
-								dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
+								dol_syslog(__METHOD__ . ' ' . implode(',', $this->errors), LOG_ERR);
 								$error++;
 							}
 							$objtmp = $this->db->fetch_object($result);
@@ -3015,8 +3014,7 @@ class BookKeeping extends CommonObject
 
 						$result = $bookkeeping->create($user);
 						if ($result < 0) {
-							$this->error = $bookkeeping->error;
-							$this->errors = $bookkeeping->errors;
+							$this->setErrorsFromObject($bookkeeping);
 							$error++;
 						}
 					}

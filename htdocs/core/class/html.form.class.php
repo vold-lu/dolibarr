@@ -1149,15 +1149,16 @@ class Form
 	 * Return list of types of lines (product or service)
 	 * Example: 0=product, 1=service, 9=other (for external module)
 	 *
-	 * @param 	string 				$selected 	Preselected type
-	 * @param 	string 				$htmlname 	Name of field in html form
-	 * @param 	int<0,1>|string 	$showempty 	Add an empty field
-	 * @param 	int 				$hidetext 	Do not show label 'Type' before combo box (used only if there is at least 2 choices to select)
-	 * @param 	integer 			$forceall 	1=Force to show products and services in combo list, whatever are activated modules, 0=No force, 2=Force to show only Products, 3=Force to show only services, -1=Force none (and set hidden field to 'service')
-	 * @param	string				$morecss	More css
+	 * @param 	string 				$selected 		Preselected type
+	 * @param 	string 				$htmlname 		Name of field in html form
+	 * @param 	int<0,1>|string 	$showempty 		Add an empty field
+	 * @param 	int 				$hidetext 		Do not show label 'Type' before combo box (used only if there is at least 2 choices to select)
+	 * @param 	integer 			$forceall 		1=Force to show products and services in combo list, whatever are activated modules, 0=No force, 2=Force to show only Products, 3=Force to show only services, -1=Force none (and set hidden field to 'service')
+	 * @param	string				$morecss		More css
+	 * @param	int					$useajaxcombo	1=Use ajaxcombo
 	 * @return  void
 	 */
-	public function select_type_of_lines($selected = '', $htmlname = 'type', $showempty = 0, $hidetext = 0, $forceall = 0, $morecss = "")
+	public function select_type_of_lines($selected = '', $htmlname = 'type', $showempty = 0, $hidetext = 0, $forceall = 0, $morecss = "", $useajaxcombo = 1)
 	{
 		// phpcs:enable
 		global $langs;
@@ -1166,11 +1167,11 @@ class Form
 		if ($forceall == 1 || (empty($forceall) && isModEnabled("product") && isModEnabled("service"))
 			|| (empty($forceall) && !isModEnabled('product') && !isModEnabled('service'))) {
 			if (empty($hidetext)) {
-				print $langs->trans("Type") . ': ';
+				print $langs->trans("Type").'...';
 			}
 			print '<select class="flat'.($morecss ? ' '.$morecss : '').'" id="select_' . $htmlname . '" name="' . $htmlname . '">';
 			if ($showempty) {
-				print '<option value="-1"';
+				print '<option value="-1" class="opacitymedium"'.($useajaxcombo ? '' : ' disabled="disabled"');
 				if ($selected == -1) {
 					print ' selected';
 				}
@@ -1196,7 +1197,10 @@ class Form
 			print '>' . $langs->trans("Service");
 
 			print '</select>';
-			print ajax_combobox('select_' . $htmlname);
+
+			if ($useajaxcombo) {
+				print ajax_combobox('select_' . $htmlname);
+			}
 			//if ($user->admin) print info_admin($langs->trans("YouCanChangeValuesForThisListFromDictionarySetup"),1);
 		}
 		if ((empty($forceall) && !isModEnabled('product') && isModEnabled("service")) || $forceall == 3) {
@@ -2228,7 +2232,13 @@ class Form
 			$sql .= " AND u.fk_soc IS NULL";
 		}
 		if (!empty($morefilter)) {
-			$sql .= " " . $morefilter;
+			$errormessage = '';
+			$sql .= forgeSQLFromUniversalSearchCriteria($morefilter, $errormessage);
+			if ($errormessage) {
+				$this->errors[] = $errormessage;
+				dol_syslog(__METHOD__.' '.implode(',', $this->errors), LOG_ERR);
+				return -1;
+			}
 		}
 
 		//Add hook to filter on user (for example on usergroup define in custom modules)
@@ -2425,28 +2435,29 @@ class Form
 	 * Return select list of users. Selected users are stored into session.
 	 * List of users are provided into $_SESSION['assignedtouser'].
 	 *
-	 * @param string 	$action 			Value for $action
-	 * @param string 	$htmlname			Field name in form
-	 * @param int<0,1> 	$show_empty 		0=list without the empty value, 1=add empty value
-	 * @param int[] 	$exclude 			Array list of users id to exclude
-	 * @param int<0,1>	$disabled 			If select list must be disabled
-	 * @param int[]|string 	$include 			Array list of users id to include or 'hierarchy' to have only supervised users
-	 * @param int[]|int	$enableonly 		Array list of users id to be enabled. All other must be disabled
-	 * @param string	$force_entity 		'0' or Ids of environment to force
-	 * @param int 		$maxlength 			Maximum length of string into list (0=no limit)
-	 * @param int<0,1>	$showstatus 		0=show user status only if status is disabled, 1=always show user status into label, -1=never show user status
-	 * @param string 	$morefilter 		Add more filters into sql request
-	 * @param int 		$showproperties 	Show properties of each attendees
-	 * @param int[] 	$listofuserid 		Array with properties of each user
-	 * @param int[] 	$listofcontactid 	Array with properties of each contact
-	 * @param int[] 	$listofotherid 		Array with properties of each other contact
-	 * @return    string                    HTML select string
+	 * @param 	string 								$action 			Value for $action
+	 * @param 	string 								$htmlname			Field name in form
+	 * @param 	int<0,1> 							$show_empty 		0=list without the empty value, 1=add empty value
+	 * @param 	int[] 								$exclude 			Array list of users id to exclude
+	 * @param 	int<0,1>							$disabled 			If select list must be disabled
+	 * @param 	int[]|''|'hierarchy'|'hierarchyme' 	$include 			Array list of users id to include or 'hierarchy' to have only supervised users
+	 * @param 	int[]|int							$enableonly 		Array list of users id to be enabled. All other must be disabled
+	 * @param 	string								$force_entity 		'0' or Ids of environment to force
+	 * @param 	int 								$maxlength 			Maximum length of string into list (0=no limit)
+	 * @param 	int<0,1>							$showstatus 		0=show user status only if status is disabled, 1=always show user status into label, -1=never show user status
+	 * @param 	string 								$morefilter 		Add more filters into sql request (Example: '(employee:=:1)'). This value must not come from user input.
+	 * @param 	int 								$showproperties 	Show properties of each attendees
+	 * @param 	int[] 								$listofuserid 		Array with properties of each user
+	 * @param 	int[] 								$listofcontactid 	Array with properties of each contact
+	 * @param 	int[] 								$listofotherid 		Array with properties of each other contact
+	 * @param	int									$canremoveowner		1 if we can remove owner, 0=no way
+	 * @return  string    	    	            						HTML select string
 	 * @see select_dolgroups()
 	 */
-	public function select_dolusers_forevent($action = '', $htmlname = 'userid', $show_empty = 0, $exclude = null, $disabled = 0, $include = array(), $enableonly = array(), $force_entity = '0', $maxlength = 0, $showstatus = 0, $morefilter = '', $showproperties = 0, $listofuserid = array(), $listofcontactid = array(), $listofotherid = array())
+	public function select_dolusers_forevent($action = '', $htmlname = 'userid', $show_empty = 0, $exclude = null, $disabled = 0, $include = array(), $enableonly = array(), $force_entity = '0', $maxlength = 0, $showstatus = 0, $morefilter = '', $showproperties = 0, $listofuserid = array(), $listofcontactid = array(), $listofotherid = array(), $canremoveowner = 1)
 	{
 		// phpcs:enable
-		global $langs;
+		global $langs, $user;
 
 		$userstatic = new User($this->db);
 		$out = '';
@@ -2479,8 +2490,25 @@ class Form
 				$ownerid = $value['id'];
 				$out .= ' (' . $langs->trans("Owner") . ')';
 			}
+			// Add picto to delete owner/assignee
 			if ($nbassignetouser > 1 && $action != 'view') {
-				$out .= ' <input type="image" style="border: 0px;" src="' . img_picto($langs->trans("Remove"), 'delete', '', 0, 1) . '" value="' . $userstatic->id . '" class="removedassigned reposition" id="removedassigned_' . $userstatic->id . '" name="removedassigned_' . $userstatic->id . '">';
+				$canremoveassignee = 1;
+				if ($i == 0) {
+					// We are on the owner of the event
+					if (!$canremoveowner) {
+						$canremoveassignee = 0;
+					}
+					if (!$user->hasRight('agenda', 'allactions', 'create')) {
+						$canremoveassignee = 0;		// Can't remove the owner
+					}
+				} else {
+					// We are not on the owner of the event but on a secondary assignee
+				}
+				if ($canremoveassignee) {
+					// If user has all permission, he should be ableto remove a assignee.
+					// If user has not all permission, he can onlyremove assignee of other (he can't remove itself)
+					$out .= ' <input type="image" style="border: 0px;" src="' . img_picto($langs->trans("Remove"), 'delete', '', 0, 1) . '" value="' . $userstatic->id . '" class="removedassigned reposition" id="removedassigned_' . $userstatic->id . '" name="removedassigned_' . $userstatic->id . '">';
+				}
 			}
 			// Show my availability
 			if ($showproperties) {
@@ -7404,6 +7432,7 @@ class Form
 					$hourend = $hourstart;
 				}
 			}
+
 			// Show hour
 			$retstring .= '<select' . ($disabled ? ' disabled' : '') . ' class="flat valignmiddle maxwidth50 ' . ($fullday ? $fullday . 'hour' : '') . '" id="' . $prefix . 'hour" name="' . $prefix . 'hour">';
 			if ($emptyhours) {
@@ -7426,7 +7455,7 @@ class Form
 
 		if ($m) {
 			// Show minutes
-			$retstring .= '<select' . ($disabled ? ' disabled' : '') . ' class="flat valignmiddle maxwidth50 ' . ($fullday ? $fullday . 'min' : '') . '" id="' . $prefix . 'min" name="' . $prefix . 'min">';
+			$retstring .= '<select ' . ($disabled ? ' disabled' : '') . ' class="flat valignmiddle maxwidth50 ' . ($fullday ? $fullday . 'min' : '') . '" id="' . $prefix . 'min" name="' . $prefix . 'min">';
 			if ($emptyhours) {
 				$retstring .= '<option value="-1">&nbsp;</option>';
 			}
@@ -7444,7 +7473,7 @@ class Form
 		}
 
 		// Add a "Now" link
-		if (!empty($conf->use_javascript_ajax) && $addnowlink) {
+		if (!empty($conf->use_javascript_ajax) && $addnowlink && !$disabled) {
 			// Script which will be inserted in the onClick of the "Now" link
 			$reset_scripts = "";
 			if ($addnowlink == 2) { // local computer time
@@ -7531,7 +7560,7 @@ class Form
 		}
 
 		// Add a "Plus one hour" link
-		if ($conf->use_javascript_ajax && $addplusone) {
+		if ($conf->use_javascript_ajax && $addplusone && !$disabled) {
 			// Script which will be inserted in the onClick of the "Add plusone" link
 			$reset_scripts = "";
 
@@ -7569,7 +7598,7 @@ class Form
 		}
 
 		// Add a link to set data
-		if ($conf->use_javascript_ajax && !empty($adddateof)) {
+		if ($conf->use_javascript_ajax && !empty($adddateof) && !$disabled) {
 			if (!is_array($adddateof)) {
 				$arrayofdateof = array(array('adddateof' => $adddateof, 'labeladddateof' => $labeladddateof));
 			} else {

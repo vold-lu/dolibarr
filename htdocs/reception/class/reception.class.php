@@ -647,8 +647,7 @@ class Reception extends CommonObject
 
 						if (intval($result) < 0) {
 							$error++;
-							$this->errors[] = $mouvS->error;
-							$this->errors = array_merge($this->errors, $mouvS->errors);
+							$this->setErrorsFromObject($mouvS);
 							break;
 						}
 					} else {
@@ -661,8 +660,7 @@ class Reception extends CommonObject
 
 						if (intval($result) < 0) {
 							$error++;
-							$this->errors[] = $mouvS->error;
-							$this->errors = array_merge($this->errors, $mouvS->errors);
+							$this->setErrorsFromObject($mouvS);
 							break;
 						}
 					}
@@ -809,8 +807,7 @@ class Reception extends CommonObject
 
 			$ret = $supplierorderdispatch->fetchAll('', '', 0, 0, $filter);
 			if ($ret < 0) {
-				$this->error = $supplierorderdispatch->error;
-				$this->errors = $supplierorderdispatch->errors;
+				$this->setErrorsFromObject($supplierorderdispatch);
 				return $ret;
 			} else {
 				// build array with quantity received by product in all supplier orders (origin)
@@ -895,8 +892,7 @@ class Reception extends CommonObject
 		$supplierorderline = new CommandeFournisseurLigne($this->db);
 		$result = $supplierorderline->fetch($id);
 		if ($result <= 0) {
-			$this->error = $supplierorderline->error;
-			$this->errors = $supplierorderline->errors;
+			$this->setErrorsFromObject($supplierorderline);
 			return -1;
 		}
 

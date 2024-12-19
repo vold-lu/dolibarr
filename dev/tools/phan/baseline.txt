@@ -17,7 +17,7 @@ return [
     // PhanTypeMismatchProperty : 130+ occurrences
     // PhanPluginUnknownArrayMethodParamType : 120+ occurrences
     // PhanPluginUnknownPropertyType : 110+ occurrences
-    // PhanPossiblyUndeclaredVariable : 80+ occurrences
+    // PhanPossiblyUndeclaredVariable : 65+ occurrences
     // PhanRedefineFunction : 45+ occurrences
     // PhanTypeExpectedObjectPropAccess : 45+ occurrences
     // PhanTypeMismatchArgumentNullableInternal : 40+ occurrences
@@ -507,7 +507,7 @@ return [
         'htdocs/recruitment/admin/setup_candidatures.php' => ['PhanEmptyForeach'],
         'htdocs/recruitment/class/recruitmentcandidature.class.php' => ['PhanUndeclaredProperty'],
         'htdocs/recruitment/class/recruitmentjobposition.class.php' => ['PhanUndeclaredProperty'],
-        'htdocs/recruitment/core/modules/recruitment/doc/pdf_standard_recruitmentjobposition.modules.php' => ['PhanPossiblyUndeclaredVariable', 'PhanTypeMismatchArgumentProbablyReal', 'PhanUndeclaredProperty'],
+        'htdocs/recruitment/core/modules/recruitment/doc/pdf_standard_recruitmentjobposition.modules.php' => ['PhanTypeMismatchArgumentProbablyReal', 'PhanUndeclaredProperty'],
         'htdocs/recruitment/core/modules/recruitment/mod_recruitmentcandidature_advanced.php' => ['PhanPluginSuspiciousParamOrder', 'PhanUndeclaredProperty'],
         'htdocs/recruitment/core/modules/recruitment/mod_recruitmentjobposition_advanced.php' => ['PhanPluginSuspiciousParamOrder', 'PhanUndeclaredProperty'],
         'htdocs/recruitment/index.php' => ['PhanUndeclaredGlobalVariable'],
@@ -523,7 +523,7 @@ return [
         'htdocs/salaries/card.php' => ['PhanPossiblyUndeclaredGlobalVariable'],
         'htdocs/salaries/class/api_salaries.class.php' => ['PhanPluginUnknownArrayMethodParamType', 'PhanPluginUnknownArrayMethodReturnType'],
         'htdocs/salaries/list.php' => ['PhanPossiblyUndeclaredGlobalVariable', 'PhanUndeclaredGlobalVariable'],
-        'htdocs/salaries/paiement_salary.php' => ['PhanPossiblyUndeclaredGlobalVariable', 'PhanTypeMismatchArgumentProbablyReal', 'PhanUndeclaredProperty'],
+        'htdocs/salaries/paiement_salary.php' => ['PhanTypeMismatchArgumentProbablyReal', 'PhanUndeclaredProperty'],
         'htdocs/salaries/virement_request.php' => ['PhanPossiblyUndeclaredGlobalVariable', 'PhanUndeclaredProperty'],
         'htdocs/societe/admin/societe.php' => ['PhanTypeMismatchArgumentProbablyReal', 'PhanUndeclaredMethod'],
         'htdocs/societe/ajax/company.php' => ['PhanTypeMismatchArgumentProbablyReal', 'PhanUndeclaredProperty'],
