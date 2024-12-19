@@ -2237,7 +2237,11 @@ class Form
 			if ($errormessage) {
 				$this->errors[] = $errormessage;
 				dol_syslog(__METHOD__.' '.implode(',', $this->errors), LOG_ERR);
-				return -1;
+				if ($outputmode == 0) {
+					return 'Error bad param $morefilter';
+				} else {
+					return array();
+				}
 			}
 		}
 
