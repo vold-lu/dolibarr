@@ -4412,10 +4412,12 @@ table.liste tr:last-child th:last-child {
 	border-bottom-right-radius: <?php echo $borderradius; ?>px;
 }
 
-table#tablelines tr:last-of-type td:first-child, table#tablelines tr#trlinefordates, table#tablelines tr#trlinefordates td {
+table#tablelines tr:last-of-type td:first-child, table#tablelines tr#trlinefordates, table#tablelines tr#trlinefordates td,
+table#tablelinesservice tr:last-of-type td:first-child, table#tablelinesservice tr#trlinefordates, table#tablelinesservice tr#trlinefordates td {
 	border-bottom-left-radius: <?php echo $borderradius; ?>px;
 }
-table#tablelines tr:last-of-type td:last-child, table#tablelines tr#trlinefordates, table#tablelines tr#trlinefordates td {
+table#tablelines tr:last-of-type td:last-child, table#tablelines tr#trlinefordates, table#tablelines tr#trlinefordates td,
+table#tablelinesservice tr:last-of-type td:last-child, table#tablelinesservice tr#trlinefordates, table#tablelinesservice tr#trlinefordates td {
 	border-bottom-right-radius: <?php echo $borderradius; ?>px;
 }
 
@@ -5613,7 +5615,7 @@ table.table-fiche-title .col-title div.titre > span:not(.print-barre-liste) {
 }
 
 table.table-fiche-title, div.fiche>table.table-fiche-title {
-	margin-bottom: 18px;
+	margin-bottom: 12px;
 }
 .table-list-of-attached-files, .table-list-of-links {
 	margin-bottom: 0 !important;
@@ -8732,9 +8734,9 @@ table.jPicker {
 	.side-nav {
 		z-index: 200;
 		background: var(--colorbackvmenu1);
-		/* padding-top: 70px; */
-		position: relative;
-		top: 70px;
+		padding-top: 75px;
+		/*position: relative;
+		top: 75px;*/
 		width: 245px; 	/* must be same than div.login_block */
 		box-shadow: none;
 	}

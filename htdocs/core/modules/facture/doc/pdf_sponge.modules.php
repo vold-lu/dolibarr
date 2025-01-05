@@ -986,7 +986,7 @@ class pdf_sponge extends ModelePDFFactures
 
 					$drawTabHideTop = $hidetop;
 					$drawTabTop = $this->tab_top_newpage;
-					$drawTabBottom = $this->page_hauteur - $this->heightforfooter;;
+					$drawTabBottom = $this->page_hauteur - $this->heightforfooter;
 					$hideBottom = 0; // TODO understand why it change to 1 or  0 during process
 
 					if ($i == $pageposbeforeprintlines) {
