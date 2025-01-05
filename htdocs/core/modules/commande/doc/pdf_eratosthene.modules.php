@@ -278,7 +278,7 @@ class pdf_eratosthene extends ModelePDFCommandes
 
 			if ($dir === null) {
 				dol_syslog(get_class($this).'::'.__METHOD__."Target directory should not be null.". getCallerInfoString(), LOG_ERR);
-				$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
+				$this->error = $langs->transnoentities("ErrorCanNotCreateDir", "Null dir");
 				return 0;
 			}
 

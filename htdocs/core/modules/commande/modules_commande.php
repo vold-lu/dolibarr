@@ -85,14 +85,14 @@ abstract class ModelePDFCommandes extends CommonDocGenerator
 	/**
 	 * Local tax rates Array[tax_type][tax_rate]
 	 *
-	 * @var array<string,array<int,float>>
+	 * @var array<int,array<string,float>>
 	 */
 	public $localtax1;
 
 	/**
 	 * Local tax rates Array[tax_type][tax_rate]
 	 *
-	 * @var array<string,array<int,float>>
+	 * @var array<int,array<string,float>>
 	 */
 	public $localtax2;
 

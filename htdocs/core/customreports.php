@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2020-2024 Laurent Destailleur  <eldy@users.sourceforge.net>
  * Copyright (C) 2024-2025	MDW						<mdeweerd@users.noreply.github.com>
  * Copyright (C) 2024		Frédéric France			<frederic.france@free.fr>
@@ -41,9 +42,9 @@
  */
 
 // Initialise values
-$search_xaxis = array();
 $search_groupby = array();
 $tabfamily = null;
+$objecttype = null;
 
 if (!defined('USE_CUSTOM_REPORT_AS_INCLUDE')) {
 	require '../main.inc.php';
@@ -70,7 +71,7 @@ if (!defined('USE_CUSTOM_REPORT_AS_INCLUDE')) {
 	'@phan-var-force string[] $search_groupby';
 
 	$search_yaxis = GETPOST('search_yaxis', 'array');
-	$search_graph = GETPOST('search_graph', 'restricthtml');
+	$search_graph = (string) GETPOST('search_graph', 'restricthtml');
 
 	// Load variable for pagination
 	$limit = GETPOSTINT('limit') ? GETPOSTINT('limit') : $conf->liste_limit;
@@ -113,12 +114,21 @@ if (empty($mode)) {
 if (!isset($search_measures)) {
 	$search_measures = array(0 => 't.count');
 }
+if (!isset($search_xaxis)) {
+	// Ensure value is set and not null.
+	$search_xaxis = array();
+}
+if (!isset($search_graph)) {
+	// Ensure value is set and not null
+	$search_graph = '';
+}
 if (!empty($object)) {
 	$objecttype = $object->element.($object->module ? '@'.$object->module : '');
 }
-if (empty($objecttype)) {
+if (!is_string($objecttype) || empty($objecttype)) {
 	$objecttype = 'thirdparty';
 }
+'@phan-var-force string $objecttype';  // Help phan that suggests $objecttype can be null
 
 require_once DOL_DOCUMENT_ROOT."/core/class/extrafields.class.php";
 require_once DOL_DOCUMENT_ROOT."/core/class/html.form.class.php";
@@ -163,6 +173,7 @@ $arrayoftype = array(
 
 // Complete $arrayoftype by external modules
 $parameters = array('objecttype' => $objecttype, 'tabfamily' => $tabfamily);
+// @phan-suppress-next-line PhanTypeMismatchArgumentNullable
 $reshook = $hookmanager->executeHooks('loadDataForCustomReports', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) {
 	setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
@@ -191,9 +202,12 @@ if ($objecttype) {
 		} else {
 			$fileforclass = "/".$objecttype."/class/".$objecttype.".class.php";
 		}
-		dol_include_once($fileforclass);
+		$ObjectClassName = null;
 
-		$ObjectClassName = $arrayoftype[$objecttype]['ObjectClassName'];
+		if ($fileforclass !== null) {
+			dol_include_once($fileforclass);
+			$ObjectClassName = $arrayoftype[$objecttype]['ObjectClassName'];
+		}
 		if (!empty($ObjectClassName)) {
 			if (class_exists($ObjectClassName)) {
 				$object = new $ObjectClassName($db);
@@ -369,7 +383,7 @@ if (!defined('USE_CUSTOM_REPORT_AS_INCLUDE')) {
 
 $newarrayoftype = array();
 foreach ($arrayoftype as $key => $val) {
-	if (dol_eval($val['enabled'], 1, 1, '1')) {
+	if (dol_eval((string) $val['enabled'], 1, 1, '1')) {
 		$newarrayoftype[$key] = $arrayoftype[$key];
 	}
 	if (!empty($val['langs'])) {
@@ -378,11 +392,15 @@ foreach ($arrayoftype as $key => $val) {
 }
 
 $count = 0;
-$arrayoffilterfields = fillArrayOfFilterFields($object, 't', $langs->trans($newarrayoftype[$objecttype]['label']), $arrayoffilterfields, 0, $count);
+$label = '';
+if (array_key_exists($objecttype, $newarrayoftype)) {
+	$label = $langs->trans($newarrayoftype[$objecttype]['label']);
+}
+$arrayoffilterfields = fillArrayOfFilterFields($object, 't', $label, $arrayoffilterfields, 0, $count);
 $arrayoffilterfields = dol_sort_array($arrayoffilterfields, 'position', 'asc', 0, 0, 1);
 
 $count = 0;
-$arrayofmesures = fillArrayOfMeasures($object, 't', $langs->trans($newarrayoftype[$objecttype]['label']), $arrayofmesures, 0, $count);
+$arrayofmesures = fillArrayOfMeasures($object, 't', $label, $arrayofmesures, 0, $count);
 $arrayofmesures = dol_sort_array($arrayofmesures, 'position', 'asc', 0, 0, 1);
 
 $count = 0;
@@ -396,17 +414,17 @@ $arrayofgroupby = dol_sort_array($arrayofgroupby, 'position', 'asc', 0, 0, 1);
 
 // Check parameters
 if ($action == 'viewgraph') {
-	if (is_array($search_measures) && !count($search_measures)) {
+	if (!count($search_measures)) {
 		setEventMessages($langs->trans("AtLeastOneMeasureIsRequired"), null, 'warnings');
 	} elseif ($mode == 'graph' && is_array($search_xaxis) && count($search_xaxis) > 1) {
 		setEventMessages($langs->trans("OnlyOneFieldForXAxisIsPossible"), null, 'warnings');
 		$search_xaxis = array(0 => $search_xaxis[0]);
 	}
-	if (is_array($search_groupby) && count($search_groupby) >= 2) {
+	if (count($search_groupby) >= 2) {
 		setEventMessages($langs->trans("ErrorOnlyOneFieldForGroupByIsPossible"), null, 'warnings');
 		$search_groupby = array(0 => $search_groupby[0]);
 	}
-	if (is_array($search_xaxis) && !count($search_xaxis)) {
+	if (!count($search_xaxis)) {
 		setEventMessages($langs->trans("AtLeastOneXAxisIsRequired"), null, 'warnings');
 	} elseif ($mode == 'graph' && $search_graph == 'bars' && count($search_measures) > $MAXMEASURESINBARGRAPH) {
 		$langs->load("errors");
@@ -417,7 +435,7 @@ if ($action == 'viewgraph') {
 
 // Get all possible values of fields when a 'group by' is set, and save this into $arrayofvaluesforgroupby
 // $arrayofvaluesforgroupby will be used to forge lael of each grouped series
-if (is_array($search_groupby) && count($search_groupby)) {
+if (count($search_groupby)) {
 	$fieldtocount = '';
 	foreach ($search_groupby as $gkey => $gval) {
 		$gvalwithoutprefix = preg_replace('/^[a-z]+\./', '', $gval);
@@ -563,7 +581,7 @@ if (is_array($search_groupby) && count($search_groupby)) {
 				}
 			}
 			//var_dump($labeloffield);
-			setEventMessages($langs->transnoentitiesnoconv("ErrorTooManyDifferentValueForSelectedGroupBy", $MAXUNIQUEVALFORGROUP, $labeloffield), null, 'warnings');
+			setEventMessages($langs->transnoentitiesnoconv("ErrorTooManyDifferentValueForSelectedGroupBy", (string) $MAXUNIQUEVALFORGROUP, (string) $labeloffield), null, 'warnings');
 			$search_groupby = array();
 		}
 
@@ -1064,7 +1082,7 @@ foreach ($search_measures as $key => $val) {
 	$legend[] = $langs->trans($arrayofmesures[$val]['label']);
 }
 
-$useagroupby = (is_array($search_groupby) && count($search_groupby));
+$useagroupby = count($search_groupby);
 //var_dump($useagroupby);
 //var_dump($arrayofvaluesforgroupby);
 
@@ -1221,7 +1239,7 @@ if ($mode == 'graph') {
 
 		$px1->SetLegend($legend);
 		$px1->setShowLegend($SHOWLEGEND);
-		$px1->SetMinValue($px1->GetFloorMinValue());
+		$px1->SetMinValue((int) $px1->GetFloorMinValue());
 		$px1->SetMaxValue($px1->GetCeilMaxValue());
 		$px1->SetWidth($WIDTH);
 		$px1->SetHeight($HEIGHT);
