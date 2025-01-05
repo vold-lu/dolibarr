@@ -1,6 +1,6 @@
 <?php
 /* Copyright (C) 2020-2024 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) 2024		MDW							<mdeweerd@users.noreply.github.com>
+ * Copyright (C) 2024-2025	MDW						<mdeweerd@users.noreply.github.com>
  * Copyright (C) 2024		Frédéric France			<frederic.france@free.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -40,6 +40,11 @@
  * @var User $user
  */
 
+// Initialise values
+$search_xaxis = array();
+$search_groupby = array();
+$tabfamily = null;
+
 if (!defined('USE_CUSTOM_REPORT_AS_INCLUDE')) {
 	require '../main.inc.php';
 
@@ -56,14 +61,10 @@ if (!defined('USE_CUSTOM_REPORT_AS_INCLUDE')) {
 	//$search_xaxis = GETPOST('search_xaxis', 'array');
 	if (GETPOST('search_xaxis', 'alpha') && GETPOST('search_xaxis', 'alpha') != '-1') {
 		$search_xaxis = array(GETPOST('search_xaxis', 'alpha'));
-	} else {
-		$search_xaxis = array();
 	}
 	//$search_groupby = GETPOST('search_groupby', 'array');
 	if (GETPOST('search_groupby', 'alpha') && GETPOST('search_groupby', 'alpha') != '-1') {
 		$search_groupby = array(GETPOST('search_groupby', 'alpha'));
-	} else {
-		$search_groupby = array();
 	}
 
 	'@phan-var-force string[] $search_groupby';
@@ -385,11 +386,11 @@ $arrayofmesures = fillArrayOfMeasures($object, 't', $langs->trans($newarrayoftyp
 $arrayofmesures = dol_sort_array($arrayofmesures, 'position', 'asc', 0, 0, 1);
 
 $count = 0;
-$arrayofxaxis = fillArrayOfXAxis($object, 't', $langs->trans($newarrayoftype[$objecttype]['label']), $arrayofxaxis, 0, $count);
+$arrayofxaxis = fillArrayOfXAxis($object, 't', $label, $arrayofxaxis, 0, $count);
 $arrayofxaxis = dol_sort_array($arrayofxaxis, 'position', 'asc', 0, 0, 1);
 
 $count = 0;
-$arrayofgroupby = fillArrayOfGroupBy($object, 't', $langs->trans($newarrayoftype[$objecttype]['label']), $arrayofgroupby, 0, $count);
+$arrayofgroupby = fillArrayOfGroupBy($object, 't', $label, $arrayofgroupby, 0, $count);
 $arrayofgroupby = dol_sort_array($arrayofgroupby, 'position', 'asc', 0, 0, 1);
 
 
@@ -548,7 +549,7 @@ if (is_array($search_groupby) && count($search_groupby)) {
 					*/
 					$labeloffield = $arrayofgroupby[$fieldtocount]['labelnohtml'];
 				} else {
-					$labeloffield = $langs->transnoentitiesnoconv($keyforlabeloffield);
+					$labeloffield = 'FK_ISSUE'; // $langs->transnoentitiesnoconv($keyforlabeloffield);
 				}
 			} else {											// This is a common field
 				$reg = array();
@@ -585,7 +586,7 @@ if (!defined('MAIN_CUSTOM_REPORT_KEEP_GRAPH_ONLY')) {
 	print '<form method="post" action="'.$_SERVER['PHP_SELF'].'" autocomplete="off">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
 	print '<input type="hidden" name="action" value="viewgraph">';
-	print '<input type="hidden" name="tabfamily" value="'.$tabfamily.'">';
+	print '<input type="hidden" name="tabfamily" value="'.(string) $tabfamily.'">';
 
 	$viewmode = '';
 
@@ -725,9 +726,9 @@ if (!defined('MAIN_CUSTOM_REPORT_KEEP_GRAPH_ONLY')) {
 		print '</div>';
 	}
 
-	if ($mode == 'graph') {
-		//
-	}
+	//if ($mode == 'graph') {
+	//
+	//}
 
 	print '<div class="divadvancedsearchfield">';
 	print '<input type="submit" class="button buttongen button-save nomargintop" value="'.$langs->trans("Refresh").'">';
@@ -1114,7 +1115,7 @@ if ($sql) {
 				 */
 				foreach ($search_measures as $key => $val) {
 					$gi = 0;
-					foreach ($search_groupby as $gkey) {
+					foreach ($search_groupby as $gkey => $gval) {
 						//var_dump('*** Fetch #'.$ifetch.' for labeltouse='.$labeltouse.' measure number '.$key.' and group g_'.$gi);
 						//var_dump($arrayofvaluesforgroupby);
 						foreach ($arrayofvaluesforgroupby['g_'.$gi] as $gvaluepossiblekey => $gvaluepossiblelabel) {
