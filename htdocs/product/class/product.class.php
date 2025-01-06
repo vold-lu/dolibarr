@@ -87,9 +87,9 @@ class Product extends CommonObject
 		'contratdet' => array('name' => 'Contract', 'parent' => 'contrat', 'parentkey' => 'fk_contrat'),
 		'facture_fourn_det' => array('name' => 'SupplierInvoice', 'parent' => 'facture_fourn', 'parentkey' => 'fk_facture_fourn'),
 		'commande_fournisseurdet' => array('name' => 'SupplierOrder', 'parent' => 'commande_fournisseur', 'parentkey' => 'fk_commande'),
-		'mrp_production' => array('name' => 'Mo', 'parent' => 'mrp_mo', 'parentkey' => 'fk_mo' ),
-		'bom_bom' => array('name' => 'BOM'),
-		'bom_bomline' => array('name' => 'BOMLine', 'parent' => 'bom_bom', 'parentkey' => 'fk_bom'),
+		'mrp_production' => array('name' => 'Mo', 'parent' => 'mrp_mo', 'parentkey' => 'fk_mo', 'enabled' => 'isModEnabled("mrp")'),
+		'bom_bom' => array('name' => 'BOM', 'enabled' => 'isModEnabled("bom")'),
+		'bom_bomline' => array('name' => 'BOMLine', 'parent' => 'bom_bom', 'parentkey' => 'fk_bom', 'enabled' => 'isModEnabled("bom")'),
 	);
 
 	/**
@@ -1092,19 +1092,19 @@ class Product extends CommonObject
 		$this->note_private = (isset($this->note_private) ? trim($this->note_private) : null);
 		$this->note_public = (isset($this->note_public) ? trim($this->note_public) : null);
 		$this->net_measure = price2num($this->net_measure);
-		$this->net_measure_units = (empty($this->net_measure_units) ? '' : trim($this->net_measure_units));
+		$this->net_measure_units = (is_null($this->net_measure_units) ? '' : trim((string) $this->net_measure_units));
 		$this->weight = price2num($this->weight);
-		$this->weight_units = (empty($this->weight_units) ? '' : trim($this->weight_units));
+		$this->weight_units = (is_null($this->weight_units) ? '' : trim((string) $this->weight_units));
 		$this->length = price2num($this->length);
-		$this->length_units = (empty($this->length_units) ? '' : trim($this->length_units));
+		$this->length_units = (is_null($this->length_units) ? '' : trim((string) $this->length_units));
 		$this->width = price2num($this->width);
-		$this->width_units = (empty($this->width_units) ? '' : trim($this->width_units));
+		$this->width_units = (is_null($this->width_units) ? '' : trim((string) $this->width_units));
 		$this->height = price2num($this->height);
-		$this->height_units = (empty($this->height_units) ? '' : trim($this->height_units));
+		$this->height_units = (is_null($this->height_units) ? '' : trim((string) $this->height_units));
 		$this->surface = price2num($this->surface);
-		$this->surface_units = (empty($this->surface_units) ? '' : trim($this->surface_units));
+		$this->surface_units = (is_null($this->surface_units) ? '' : trim((string) $this->surface_units));
 		$this->volume = price2num($this->volume);
-		$this->volume_units = (empty($this->volume_units) ? '' : trim($this->volume_units));
+		$this->volume_units = (is_null($this->volume_units) ? '' : trim((string) $this->volume_units));
 
 		// set unit not defined
 		if (is_numeric($this->length_units)) {
@@ -1273,7 +1273,7 @@ class Product extends CommonObject
 			$sql .= ", sell_or_eat_by_mandatory = ".((empty($this->sell_or_eat_by_mandatory) || $this->sell_or_eat_by_mandatory < 0) ? 0 : (int) $this->sell_or_eat_by_mandatory);
 			$sql .= ", batch_mask = '".$this->db->escape($this->batch_mask)."'";
 
-			$sql .= ", finished = ".((!isset($this->finished) || $this->finished < 0 || $this->finished == '') ? "null" : (int) $this->finished);
+			$sql .= ", finished = ".((!isset($this->finished) || $this->finished < 0 || $this->finished === '') ? "null" : (int) $this->finished);
 			$sql .= ", fk_default_bom = ".((!isset($this->fk_default_bom) || $this->fk_default_bom < 0 || $this->fk_default_bom == '') ? "null" : (int) $this->fk_default_bom);
 			$sql .= ", net_measure = ".($this->net_measure != '' ? "'".$this->db->escape($this->net_measure)."'" : 'null');
 			$sql .= ", net_measure_units = ".($this->net_measure_units != '' ? "'".$this->db->escape($this->net_measure_units)."'" : 'null');
@@ -2697,18 +2697,18 @@ class Product extends CommonObject
 				$this->net_measure = $obj->net_measure;
 				$this->net_measure_units = $obj->net_measure_units;
 				$this->weight = $obj->weight;
-				$this->weight_units = $obj->weight_units;
+				$this->weight_units = (is_null($obj->weight_units) ? 0 : $obj->weight_units);
 				$this->length = $obj->length;
-				$this->length_units = $obj->length_units;
+				$this->length_units = (is_null($obj->length_units) ? 0 : $obj->length_units);
 				$this->width = $obj->width;
-				$this->width_units = $obj->width_units;
+				$this->width_units = (is_null($obj->width_units) ? 0 : $obj->width_units);
 				$this->height = $obj->height;
-				$this->height_units = $obj->height_units;
+				$this->height_units = (is_null($obj->height_units) ? 0 : $obj->height_units);
 
 				$this->surface = $obj->surface;
-				$this->surface_units = $obj->surface_units;
+				$this->surface_units = (is_null($obj->surface_units) ? 0 : $obj->surface_units);
 				$this->volume = $obj->volume;
-				$this->volume_units = $obj->volume_units;
+				$this->volume_units = (is_null($obj->volume_units) ? 0 : $obj->volume_units);
 				$this->barcode = $obj->barcode;
 				$this->barcode_type = $obj->fk_barcode_type;
 
@@ -2752,7 +2752,8 @@ class Product extends CommonObject
 
 				// Load multiprices array
 				if (getDolGlobalString('PRODUIT_MULTIPRICES') && empty($ignore_price_load)) {                // prices per segment
-					for ($i = 1; $i <= $conf->global->PRODUIT_MULTIPRICES_LIMIT; $i++) {
+					$maxi = getDolGlobalInt('PRODUIT_MULTIPRICES_LIMIT');
+					for ($i = 1; $i <= $maxi; $i++) {
 						$sql = "SELECT price, price_ttc, price_min, price_min_ttc,";
 						$sql .= " price_base_type, tva_tx, default_vat_code, tosell, price_by_qty, rowid, recuperableonly";
 						$sql .= " ,price_label";
@@ -2868,7 +2869,8 @@ class Product extends CommonObject
 						return -1;
 					}
 				} elseif (getDolGlobalString('PRODUIT_CUSTOMER_PRICES_BY_QTY_MULTIPRICES') && empty($ignore_price_load)) {    // prices per customer and quantity
-					for ($i = 1; $i <= $conf->global->PRODUIT_MULTIPRICES_LIMIT; $i++) {
+					$maxi = getDolGlobalInt('PRODUIT_MULTIPRICES_LIMIT');
+					for ($i = 1; $i <= $maxi; $i++) {
 						$sql = "SELECT price, price_ttc, price_min, price_min_ttc,";
 						$sql .= " price_base_type, tva_tx, default_vat_code, tosell, price_by_qty, rowid, recuperableonly";
 						$sql .= " FROM ".$this->db->prefix()."product_price";

@@ -784,7 +784,7 @@ class FormTicket
 		$ticketstat->loadCacheTypesTickets();
 
 		print '<select id="select'.$htmlname.'" class="flat minwidth100'.($morecss ? ' '.$morecss : '').'" name="'.$htmlname.($multiselect ? '[]' : '').'"'.($multiselect ? ' multiple' : '').'>';
-		if ($empty) {
+		if ($empty && !$multiselect) {
 			print '<option value="">&nbsp;</option>';
 		}
 
@@ -821,7 +821,7 @@ class FormTicket
 					print ' selected="selected"';
 				} elseif (in_array($id, $selected)) {
 					print ' selected="selected"';
-				} elseif ($arraytypes['use_default'] == "1" && empty($selected)) {
+				} elseif ($arraytypes['use_default'] == "1" && empty($selected) && !$multiselect) {
 					print ' selected="selected"';
 				}
 
