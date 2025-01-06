@@ -127,7 +127,7 @@ if (empty($reshook)) {
 	$error = 0;
 
 	if ($cancel) {
-		header("Location: ".DOL_URL_ROOT. $backtopage . (!empty($type)?'?type=sub':''));
+		header("Location: ". $backtopage . (!empty($type)?'?type=sub':''));
 		exit;
 	}
 
@@ -361,7 +361,7 @@ if (empty($reshook)) {
 		if ($result < 0) {
 			setEventMessages($object->error, $object->errors, 'errors');
 		} else {
-			header("Location: " . DOL_URL_ROOT. $backtopage . "?sortfield=t.piece_num&sortorder=asc" . ($type ? '&type='.$type : ''));
+			header("Location: " . $backtopage . "?sortfield=t.piece_num&sortorder=asc" . ($type ? '&type='.$type : ''));
 			exit;
 		}
 	}
@@ -987,7 +987,7 @@ if ($action == 'create') {
 					}
 
 					print ' &nbsp; ';
-					print '<a class="button button-cancel" href="'.DOL_URL_ROOT.$backtopage.(!empty($type)?'?type=sub':'').'">'.$langs->trans("Cancel").'</a>';
+					print '<a class="button button-cancel" href="'.$backtopage.(!empty($type)?'?type=sub':'').'">'.$langs->trans("Cancel").'</a>';
 
 					print "</div>";
 				}
