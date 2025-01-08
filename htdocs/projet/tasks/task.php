@@ -131,7 +131,7 @@ if ($action == 'update' && !GETPOST("cancel") && $user->hasRight('projet', 'cree
 		if (GETPOST('progress') == '100') {
 			$object->status = $object::STATUS_CLOSED;
 		} elseif (GETPOST('progress') != '0') {
-			$object->status = $object::STATUS_VALIDATED;
+			$object->status = $object::STATUS_ONGOING;
 		}
 
 		// Fill array 'array_options' with data from add form

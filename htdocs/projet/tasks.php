@@ -387,6 +387,7 @@ if ($action == 'createtask' && $user->hasRight('projet', 'creer')) {
 			$task->progress = $progress;
 			$task->budget_amount = $budget_amount;
 			$task->billable = $billable;
+			$task->status = Task::STATUS_VALIDATED;
 
 			// Fill array 'array_options' with data from add form
 			$ret = $extrafields->setOptionalsFromPost(null, $task);

@@ -435,6 +435,7 @@ class Task extends CommonObjectLine
 		$sql .= ", budget_amount";
 		$sql .= ", priority";
 		$sql .= ", billable";
+		$sql .= ", fk_statut";
 		$sql .= ") VALUES (";
 		$sql .= (!empty($this->entity) ? (int) $this->entity : (int) $conf->entity);
 		$sql .= ", ".((int) $this->fk_project);
@@ -453,6 +454,7 @@ class Task extends CommonObjectLine
 		$sql .= ", ".(($this->budget_amount != '' && $this->budget_amount >= 0) ? ((int) $this->budget_amount) : 'null');
 		$sql .= ", ".(($this->priority != '' && $this->priority >= 0) ? (int) $this->priority : 'null');
 		$sql .= ", ".((int) $this->billable);
+		$sql .= ", ".((int) $this->status);
 		$sql .= ")";
 
 		$this->db->begin();
@@ -2505,12 +2507,12 @@ class Task extends CommonObjectLine
 
 		// list of Statut of the task
 		$this->labelStatus[0] = 'Draft';
-		$this->labelStatus[1] = 'ToDo';
+		$this->labelStatus[1] = 'Validated';
 		$this->labelStatus[2] = 'In progress';
 		$this->labelStatus[3] = 'Closed';
 		$this->labelStatus[4] = 'Transfered';
 		$this->labelStatusShort[0] = 'Draft';
-		$this->labelStatusShort[1] = 'ToDo';
+		$this->labelStatusShort[1] = 'Validated';
 		$this->labelStatusShort[2] = 'In progress';
 		$this->labelStatusShort[3] = 'Closed';
 		$this->labelStatusShort[4] = 'Transfered';
