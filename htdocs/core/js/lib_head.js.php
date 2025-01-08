@@ -1069,11 +1069,11 @@ function document_preview(file, type, title)
 
 		};
 		img.src = file;
-
 	}
 
+	/* This function is local to document_preview. Variables like file, type, title, object_width and object_height are global inside this function */
 	function show_preview(mode) {
-		/* console.log("mode="+mode+" file="+file+" type="+type+" width="+width+" height="+height); */
+		/* console.log("mode="+mode+" file="+file+" type="+type+" title=title+" width="+width+" height="+height); */
 		var newElem = '<object name="objectpreview" data="'+file+'" type="'+type+'" width="'+object_width+'" height="'+object_height+'" param="noparam"></object>';
 
 		optionsbuttons = {}
@@ -1557,11 +1557,13 @@ if (!getDolGlobalString('MAIN_DISABLE_SELECT2_FOCUS_PROTECTION') && !defined('DI
  * TODO: Recheck with the select2 GH issue and remove once this is fixed on their side
  */
 $(document).on('select2:open', (e) => {
-	console.log("Execute the focus (click on combo or use space when on component");
+	console.log("Execute the focus (click on combo or use space when on component)");
 	const target = $(e.target);
 	if (target && target.length) {
 		let id = target[0].id || target[0].name;
-		if (id.substr(-2) == "[]") id = id.substr(0,id.length-2);
+		if (id.substr(-2) == "[]") {
+			id = id.substr(0,id.length-2);
+		}
 		document.querySelector('input[aria-controls*='+id+']').focus();
 	}
 });

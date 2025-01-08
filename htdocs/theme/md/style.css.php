@@ -933,11 +933,16 @@ input[type=checkbox], input[type=radio] {
 
 /* CSS for placeholder */
 .placeholder { color: #ccc; }
+select.placeholder { color: #ccc; }
+.select2-selection__choice .placeholder { color: #aaa; }
 ::-webkit-input-placeholder { color:#ccc; }
 :-moz-placeholder { color:#bbb; } 			/* firefox 18- */
 ::-moz-placeholder { color:#bbb; } 			/* firefox 19+ */
 :-ms-input-placeholder { color:#ccc; } 		/* ie */
 input:-moz-placeholder { color:#ccc; }
+select.placeholder option:not(.opacitymediumbycolor):not(.opacitymedium) {
+	color: var(--colortext);
+}
 
 input[name=price], input[name=weight], input[name=volume], input[name=surface], input[name=sizeheight], input[name=net_measure], select[name=incoterm_id] { margin-right: 6px; }
 fieldset {
@@ -3964,9 +3969,10 @@ div.tabs {
 	margin-right: 6px !important;*/
 	clear:both;
 	height:100%;
+	margin-top: 18px;
 }
 div.tabsElem {
-	margin-top: 12px;
+/*	margin-top: 18px; */
 }		/* To avoid overlap of tabs when not browser */
 div.tabsElem a {
 	font-weight: normal !important;
@@ -4474,10 +4480,12 @@ table.liste tr:last-child th:last-child {
 	border-bottom-right-radius: <?php echo $borderradius; ?>px;
 }
 
-table#tablelines tr:last-of-type td:first-child, table#tablelines tr#trlinefordates, table#tablelines tr#trlinefordates td {
+table#tablelines tr:last-of-type td:first-child, table#tablelines tr#trlinefordates, table#tablelines tr#trlinefordates td,
+table#tablelinesservice tr:last-of-type td:first-child, table#tablelinesservice tr#trlinefordates, table#tablelinesservice tr#trlinefordates td {
 	border-bottom-left-radius: <?php echo $borderradius; ?>px;
 }
-table#tablelines tr:last-of-type td:last-child, table#tablelines tr#trlinefordates, table#tablelines tr#trlinefordates td {
+table#tablelines tr:last-of-type td:last-child, table#tablelines tr#trlinefordates, table#tablelines tr#trlinefordates td,
+table#tablelinesservice tr:last-of-type td:last-child, table#tablelinesservice tr#trlinefordates, table#tablelinesservice tr#trlinefordates td {
 	border-bottom-right-radius: <?php echo $borderradius; ?>px;
 }
 
@@ -4490,7 +4498,7 @@ tr.liste_titre_filter td.liste_titre {
 	padding-top: 4px;
 	padding-bottom: 3px;
 }
-.liste_titre_create td, .liste_titre_create th, .liste_titre_create .tagtd
+.liste_titre_create td:not(.linecoldescription), .liste_titre_create th, .liste_titre_create .tagtd
 {
 	border-top-width: 1px;
 	border-top-color: var(--colortopbordertitle1);
@@ -4510,6 +4518,10 @@ tr#trlinefordates td {
 	border-top-width: 1px;
 	border-top-color: var(--colortopbordertitle1);
 	border-top-style: solid;
+}
+
+td.linecoldescription {
+	padding: 6px 10px 6px 12px !important;			/* t r b l */
 }
 
 table.liste th, table.noborder th, table.noborder tr.liste_titre td, table.noborder tr.box_titre td {
@@ -6418,7 +6430,10 @@ A.none, A.none:active, A.none:visited, A.none:hover {
 body.cke_show_borders {
 	margin: 5px !important;
 }
-
+table.cke_dialog.cke_browser_webkit {
+	border-collapse: separate;
+	border-radius: 10px;
+}
 .cke_dialog {
 	border: 1px #bbb solid ! important;
 }
@@ -6439,17 +6454,10 @@ a.cke_dialog_ui_button
 	-webkit-box-shadow: 3px 3px 4px #f4f4f4 !important;
 	box-shadow: 3px 3px 4px #f4f4f4 !important;
 }
-.cke_dialog_ui_hbox_last
-{
-	vertical-align: bottom !important;
-}
-.cke_dialog_ui_hbox_last
-{
-	vertical-align: bottom !important;
-}
 .cke_combo_text {
 	width: 40px !important;
 }
+
 /*
 .cke_editable
 {

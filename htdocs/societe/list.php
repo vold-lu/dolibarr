@@ -420,7 +420,7 @@ if (empty($reshook)) {
 		$searchCategorySupplierOperator = 0;
 		$searchCategoryCustomerList = array();
 		$searchCategorySupplierList = array();
-		$search_sale = '';
+		$search_sale = array();
 		$search_barcode = "";
 		$search_customer_code = '';
 		$search_supplier_code = '';
@@ -617,7 +617,7 @@ if (!$user->hasRight('fournisseur', 'lire')) {
 
 // Force the sales representative if they don't have permissions
 if (!$user->hasRight('societe', 'client', 'voir') && !$socid) {
-	$search_sale = $user->id;
+	$search_sale = array($user->id);
 }
 // Search on sale representative
 if (!empty($search_sale) && $search_sale != '-1') {
@@ -1290,7 +1290,7 @@ if (empty($type) || $type == 'f') {
 }
 
 // If the user can view prospects other than his'
-$userlist = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
+$userlist = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'u.statut:=:1', 0, '', '', 0, 1);
 $userlist[-2] = $langs->trans("NoSalesRepresentativeAffected");
 if ($user->hasRight("societe", "client", "voir") || $socid) {
 	$moreforfilter .= '<div class="divsearchfield">';

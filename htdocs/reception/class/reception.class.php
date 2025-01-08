@@ -785,11 +785,13 @@ class Reception extends CommonObject
 				$this->fetch_origin();
 				if ($this->origin_object instanceof CommonObject && empty($this->origin_object->lines)) {
 					$res = $this->origin_object->fetch_lines();
-					if ($this->origin_object instanceof CommandeFournisseur) {
-						$this->commandeFournisseur = $this->origin_object;	// deprecated
-					} else {
-						$this->commandeFournisseur = null;	// deprecated
+					$this->commandeFournisseur = null;	// deprecated
+					if ($res < 0) {
+						return $res;
 					}
+				} elseif ($this->origin_object instanceof CommandeFournisseur && empty($this->origin_object->lines)) {
+					$res = $this->origin_object->fetch_lines();
+					$this->commandeFournisseur = $this->origin_object;	// deprecated
 					if ($res < 0) {
 						return $res;
 					}
@@ -1112,7 +1114,9 @@ class Reception extends CommonObject
 		$this->db->begin();
 
 		// Stock control
-		if (isModEnabled('stock') && !getDolGlobalInt('STOCK_CALCULATE_ON_RECEPTION') && $this->statut > 0) {
+		if (isModEnabled('stock') && ((getDolGlobalInt('STOCK_CALCULATE_ON_RECEPTION') && $this->status > Reception::STATUS_DRAFT)
+				|| (getDolGlobalInt('STOCK_CALCULATE_ON_RECEPTION_CLOSE') && $this->status == Reception::STATUS_CLOSED))
+		) {
 			require_once DOL_DOCUMENT_ROOT."/product/stock/class/mouvementstock.class.php";
 
 			$langs->load("agenda");
@@ -1136,7 +1140,7 @@ class Reception extends CommonObject
 					// we do not log origin because it will be deleted
 					$mouvS->origin = null;
 
-					$result = $mouvS->livraison($user, $obj->fk_product, $obj->fk_entrepot, $obj->qty, 0, $langs->trans("ReceptionDeletedInDolibarr", $this->ref), '', $obj->eatby, $obj->sellby, $obj->batch); // Price is set to 0, because we don't want to see WAP changed
+					$result = $mouvS->livraison($user, $obj->fk_product, $obj->fk_entrepot, $obj->qty, 0, $langs->trans("ReceptionDeletedInDolibarr", $this->ref), '', $obj->eatby ? $this->db->jdate($obj->eatby) : null, $obj->sellby ? $this->db->jdate($obj->sellby) : null, $obj->batch); // Price is set to 0, because we don't want to see WAP changed
 					if ($result < 0) {
 						$error++;
 						$this->error = $mouvS->error;
