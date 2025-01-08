@@ -1726,6 +1726,17 @@ class Task extends CommonObjectLine
 			$sql .= " SET duration_effective = (SELECT SUM(element_duration) FROM ".MAIN_DB_PREFIX."element_time as ptt where ptt.elementtype = 'task' AND ptt.fk_element = ".((int) $this->id).")";
 			if (isset($this->progress)) {
 				$sql .= ", progress = ".((float) $this->progress); // Do not overwrite value if not provided
+				if ($this->progress == 100) {
+					$this->status = Task::STATUS_CLOSED;
+				} elseif ($this->progress != 0) {
+					$this->status = Task::STATUS_ONGOING;
+				} else {
+					$this->status = Task::STATUS_VALIDATED;
+				}
+				$sql .= ", fk_statut = ".$this->status;
+			} else {
+				$this->status = Task::STATUS_ONGOING;
+				$sql .= ", fk_statut = ".$this->status;
 			}
 			$sql .= " WHERE rowid = ".((int) $this->id);
 
