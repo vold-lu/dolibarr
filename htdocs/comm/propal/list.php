@@ -286,7 +286,7 @@ foreach ($object->fields as $key => $val) {
 	}
 }*/
 
-if ($socid == 0 && !$user->hasRight('societe', 'client', 'voir')) { // add VMA
+if (empty($user->socid) && !$user->hasRight('societe', 'client', 'voir')) {
 	$search_sale = $user->id;
 }
 
