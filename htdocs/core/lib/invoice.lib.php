@@ -1190,7 +1190,7 @@ function getPurchaseInvoiceUnpaidOpenTable($maxCount = 500, $socid = 0)
 	$result = '';
 
 	if (isModEnabled("supplier_invoice") && ($user->hasRight('fournisseur', 'facture', 'lire') || $user->hasRight('supplier_invoice', 'read'))) {
-		if ($user->socid > 0) $socid = $user->socid;		
+		if ($user->socid > 0) $socid = $user->socid;
 		$facstatic = new FactureFournisseur($db);
 
 		$sql = "SELECT ff.rowid, ff.ref, ff.fk_statut as status, ff.type, ff.libelle as label, ff.total_ht, ff.total_tva, ff.total_ttc, ff.paye";

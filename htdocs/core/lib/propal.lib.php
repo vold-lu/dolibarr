@@ -217,7 +217,7 @@ function getCustomerProposalPieChart($socid = 0)
 	if (!isModEnabled('propal') || !$user->hasRight('propal', 'lire')) {
 		return '';
 	}
-	
+
 	$listofstatus = array(Propal::STATUS_DRAFT, Propal::STATUS_VALIDATED, Propal::STATUS_SIGNED, Propal::STATUS_NOTSIGNED, Propal::STATUS_BILLED);
 
 	$propalstatic = new Propal($db);
