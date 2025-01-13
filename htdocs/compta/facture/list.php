@@ -304,15 +304,15 @@ $object->fields = dol_sort_array($object->fields, 'position');
 $arrayfields = dol_sort_array($arrayfields, 'position');
 '@phan-var-force array<string,array{label:string,checked?:int<0,1>,position?:int,help?:string}> $arrayfields';  // dol_sort_array looses type for Phan
 
-if (!$user->hasRight('societe', 'client', 'voir')) {
-	$search_sale = $user->id;
-}
-
 // Security check
 $fieldid = (!empty($ref) ? 'ref' : 'rowid');
 if (!empty($user->socid)) {
 	$socid = $user->socid;
 }
+if (empty($user->socid) && !$user->hasRight('societe', 'client', 'voir')) {
+	$search_sale = $user->id;
+}
+
 $result = restrictedArea($user, 'facture', $id, '', '', 'fk_soc', $fieldid);
 
 
