@@ -12,7 +12,7 @@
  * Copyright (C) 2019-2024	Frédéric France				<frederic.france@free.fr>
  * Copyright (C) 2019		Josep Lluís Amador			<joseplluis@lliuretic.cat>
  * Copyright (C) 2020		Open-Dsi					<support@open-dsi.fr>
- * Copyright (C) 2024		MDW							<mdeweerd@users.noreply.github.com>
+ * Copyright (C) 2024-2025	MDW							<mdeweerd@users.noreply.github.com>
  * Copyright (C) 2024		Benjamin Falière			<benjamin.faliere@altairis.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -368,7 +368,7 @@ if (empty($reshook)) {
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) {	// All tests are required to be compatible with all browsers
 		$search_all = "";
 		$search_id = '';
-		$search_ref = '';
+		$search_ref_ext = '';
 		$search_firstlast_only = "";
 		$search_lastname = "";
 		$search_firstname = "";
@@ -866,8 +866,8 @@ if ($search_all != '') {
 if ($search_id > 0) {
 	$param .= "&search_id=".((int) $search_id);
 }
-if ($search_ref) {
-	$param .= "&search_ref=".urlencode($search_ref);
+if ($search_ref_ext) {
+	$param .= "&search_ref_ext=".urlencode($search_ref_ext);
 }
 if ($search_lastname != '') {
 	$param .= '&search_lastname='.urlencode($search_lastname);

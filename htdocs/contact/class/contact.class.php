@@ -664,7 +664,7 @@ class Contact extends CommonObject
 		$sql .= ", phone = ".(isset($this->phone_pro) ? "'".$this->db->escape($this->phone_pro)."'" : "NULL");
 		$sql .= ", phone_perso = ".(isset($this->phone_perso) ? "'".$this->db->escape($this->phone_perso)."'" : "NULL");
 		$sql .= ", phone_mobile = ".(isset($this->phone_mobile) ? "'".$this->db->escape($this->phone_mobile)."'" : "NULL");
-		$sql .= ", priv = '".$this->db->escape($this->priv)."'";
+		$sql .= ", priv = ".((int) $this->priv);
 		$sql .= ", fk_prospectlevel = '".$this->db->escape($this->fk_prospectlevel)."'";
 		if (isset($this->stcomm_id)) {
 			$sql .= ", fk_stcommcontact = ".($this->stcomm_id > 0 || $this->stcomm_id == -1 ? $this->stcomm_id : "0");
