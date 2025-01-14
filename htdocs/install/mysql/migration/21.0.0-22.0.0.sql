@@ -32,6 +32,11 @@
 -- -- VPGSQL8.2 SELECT dol_util_rebuild_sequences();
 
 
+-- V21 forgotten
+
+ALTER TABLE llx_societe_rib MODIFY COLUMN label varchar(180);
+ALTER TABLE llx_societe_rib MODIFY COLUMN iban_prefix varchar(100);
+
 
 -- V22 migration
 
