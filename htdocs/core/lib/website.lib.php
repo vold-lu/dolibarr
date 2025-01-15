@@ -33,7 +33,7 @@
  */
 function dolStripPhpCode($str, $replacewith = '')
 {
-	$str = str_replace('<?=', '<?php', $str);
+	$str = str_replace('<?=', '<?php echo', $str);	// replace a bad practive
 
 	$newstr = '';
 
@@ -77,9 +77,9 @@ function dolStripPhpCode($str, $replacewith = '')
  */
 function dolKeepOnlyPhpCode($str)
 {
-	$str = str_replace('<?=', '<?php', $str);
+	$str = str_replace('<?=', '<?php echo', $str);
 	$str = str_replace('<?php', '__LTINTPHP__', $str);
-	$str = str_replace('<?', '<?php', $str);			// replace the short_open_tag. It is recommended to set this is Off in php.ini
+	$str = str_replace('<?', '<?php', $str);			// replace the short_open_tag. It is recommended to set this to Off in php.ini
 	$str = str_replace('__LTINTPHP__', '<?php', $str);
 
 	$newstr = '';
@@ -1354,7 +1354,9 @@ function getImageFromHtmlContent($htmlContent, $imageNumber = 1)
 	}
 
 	// Load HTML content into object
-	$dom->loadHTML($htmlContent);
+	// We add the @ to avoid verbose warnings logsin the error.log file. For example:
+	// "PHP message: PHP Warning:  DOMDocument::loadHTML(): Tag section invalid in Entity, line: ...", etc.
+	@$dom->loadHTML($htmlContent);
 
 	// Re-enable HTML load errors
 	libxml_clear_errors();
