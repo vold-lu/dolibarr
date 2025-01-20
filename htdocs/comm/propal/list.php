@@ -286,7 +286,7 @@ foreach ($object->fields as $key => $val) {
 	}
 }*/
 
-if (!$user->hasRight('societe', 'client', 'voir')) {
+if (empty($user->socid) && !$user->hasRight('societe', 'client', 'voir')) {
 	$search_sale = $user->id;
 }
 

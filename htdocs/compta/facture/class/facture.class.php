@@ -4753,7 +4753,7 @@ class Facture extends CommonInvoice
 		}
 		// If the internal user must only see his customers, force searching by him
 		$search_sale = 0;
-		if (!$user->hasRight('societe', 'client', 'voir')) {
+		if (empty($user->socid) && !$user->hasRight('societe', 'client', 'voir')) {
 			$search_sale = $user->id;
 		}
 		// Search on sale representative
@@ -4946,7 +4946,7 @@ class Facture extends CommonInvoice
 
 		$sql = "SELECT f.rowid, f.date_lim_reglement as datefin, f.fk_statut as status, f.total_ht";
 		$sql .= " FROM ".MAIN_DB_PREFIX."facture as f";
-		if (!$user->hasRight('societe', 'client', 'voir')) {
+		if (empty($user->socid) && !$user->hasRight('societe', 'client', 'voir')) {
 			$sql .= " JOIN ".MAIN_DB_PREFIX."societe_commerciaux as sc ON f.fk_soc = sc.fk_soc";
 			$sql .= " WHERE sc.fk_user = ".((int) $user->id);
 			$clause = " AND";
@@ -5194,7 +5194,7 @@ class Facture extends CommonInvoice
 		$sql = "SELECT count(f.rowid) as nb";
 		$sql .= " FROM ".MAIN_DB_PREFIX."facture as f";
 		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."societe as s ON f.fk_soc = s.rowid";
-		if (!$user->hasRight('societe', 'client', 'voir')) {
+		if (empty($user->socid) && !$user->hasRight('societe', 'client', 'voir')) {
 			$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."societe_commerciaux as sc ON s.rowid = sc.fk_soc";
 			$sql .= " WHERE sc.fk_user = ".((int) $user->id);
 			$clause = "AND";
