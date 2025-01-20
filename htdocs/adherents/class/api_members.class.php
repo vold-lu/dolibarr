@@ -351,7 +351,7 @@ class Members extends DolibarrApi
 			}
 			if ($field == 'array_options' && is_array($value)) {
 				foreach ($value as $index => $val) {
-					$member->array_options[$index] = $val;
+					$member->array_options[$index] = $this->_checkValForAPI($field, $val, $member);
 				}
 				continue;
 			}
