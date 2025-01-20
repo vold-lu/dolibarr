@@ -2,7 +2,7 @@
 /* Copyright (C) 2016		Marcos García			<marcosgdf@gmail.com>
  * Copyright (C) 2018		Juanjo Menent			<jmenent@2byte.es>
  * Copyright (C) 2022   	Open-Dsi				<support@open-dsi.fr>
- * Copyright (C) 2024		MDW						<mdeweerd@users.noreply.github.com>
+ * Copyright (C) 2024-2025	MDW						<mdeweerd@users.noreply.github.com>
  * Copyright (C) 2024       Frédéric France         <frederic.france@free.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -884,11 +884,7 @@ class ProductCombination
 				$productCombinationLevel->fk_price_level = $i;
 				$productCombinationLevel->variation_price = $price_impact[$i];
 
-				if (is_array($price_var_percent)) {
-					$productCombinationLevel->variation_price_percentage = (bool) $price_var_percent[$i] ;
-				} else {
-					$productCombinationLevel->variation_price_percentage = $price_var_percent;
-				}
+				$productCombinationLevel->variation_price_percentage = (bool) $price_var_percent[$i] ;
 
 				$newcomb->combination_price_levels[$i] = $productCombinationLevel;
 			}
