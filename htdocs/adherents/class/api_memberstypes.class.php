@@ -39,7 +39,7 @@ class MembersTypes extends DolibarrApi
 	 */
 	public function __construct()
 	{
-		global $db, $conf;
+		global $db;
 		$this->db = $db;
 	}
 
@@ -89,8 +89,6 @@ class MembersTypes extends DolibarrApi
 	 */
 	public function index($sortfield = "t.rowid", $sortorder = 'ASC', $limit = 100, $page = 0, $sqlfilters = '', $properties = '')
 	{
-		global $db, $conf;
-
 		$obj_ret = array();
 
 		if (!DolibarrApiAccess::$user->hasRight('adherent', 'lire')) {
@@ -151,8 +149,8 @@ class MembersTypes extends DolibarrApi
 		if (!DolibarrApiAccess::$user->hasRight('adherent', 'configurer')) {
 			throw new RestException(401);
 		}
-		// Check mandatory fields
-		$result = $this->_validate($request_data);
+		// Check mandatory fields. Throw exception on error.
+		$this->_validate($request_data);
 
 		$membertype = new AdherentType($this->db);
 		foreach ($request_data as $field => $value) {
