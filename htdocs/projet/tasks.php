@@ -98,7 +98,7 @@ $search_progresscalc = GETPOST('search_progresscalc');
 $search_progressdeclare = GETPOST('search_progressdeclare');
 $search_task_budget_amount = GETPOST('search_task_budget_amount');
 $search_task_billable = GETPOST('search_task_billable');
-$search_status = GETPOSTINT('search_status');
+$search_status = GETPOST('search_status');
 
 $search_date_start_startmonth = GETPOSTINT('search_date_start_startmonth');
 $search_date_start_startyear = GETPOSTINT('search_date_start_startyear');
@@ -430,7 +430,6 @@ if ($action == 'createtask' && $user->hasRight('projet', 'creer')) {
 		}
 	}
 }
-
 
 /*
  * View
