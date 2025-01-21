@@ -1066,6 +1066,7 @@ function GETPOST($paramname, $check = 'alphanohtml', $method = 0, $filter = null
 	if (preg_match('/^array/', $check)) {	// If 'array' or 'array:restricthtml' or 'array:aZ09' or 'array:intcomma'
 		if (!is_array($out) || empty($out)) {
 			$out = explode(',', $out);
+			$tmpcheck = 'alphanohtml';
 		} else {
 			$tmparray = explode(':', $check);
 			if (!empty($tmparray[1])) {
@@ -1073,9 +1074,9 @@ function GETPOST($paramname, $check = 'alphanohtml', $method = 0, $filter = null
 			} else {
 				$tmpcheck = 'alphanohtml';
 			}
-			foreach ($out as $outkey => $outval) {
-				$out[$outkey] = sanitizeVal($outval, $tmpcheck, $filter, $options);
-			}
+		}
+		foreach ($out as $outkey => $outval) {
+			$out[$outkey] = sanitizeVal($outval, $tmpcheck, $filter, $options);
 		}
 	} else {
 		// If field name is 'search_xxx' then we force the add of space after each < and > (when following char is numeric) because it means
