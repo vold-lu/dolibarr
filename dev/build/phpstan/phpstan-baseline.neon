@@ -6577,12 +6577,6 @@ parameters:
 			path: ../../../htdocs/compta/sociales/card.php
 
 		-
-			message: '#^Variable \$resteapayer might not be defined\.$#'
-			identifier: variable.undefined
-			count: 3
-			path: ../../../htdocs/compta/sociales/card.php
-
-		-
 			message: '#^Negated boolean expression is always true\.$#'
 			identifier: booleanNot.alwaysTrue
 			count: 1
@@ -19593,25 +19587,13 @@ parameters:
 		-
 			message: '#^Variable \$begin might not be defined\.$#'
 			identifier: variable.undefined
-			count: 5
-			path: ../../../htdocs/fourn/contact.php
-
-		-
-			message: '#^Variable \$contactname might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
+			count: 3
 			path: ../../../htdocs/fourn/contact.php
 
 		-
 			message: '#^Variable \$socid might not be defined\.$#'
 			identifier: variable.undefined
 			count: 4
-			path: ../../../htdocs/fourn/contact.php
-
-		-
-			message: '#^Variable \$stcomm might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
 			path: ../../../htdocs/fourn/contact.php
 
 		-
@@ -22289,12 +22271,6 @@ parameters:
 			identifier: isset.property
 			count: 2
 			path: ../../../htdocs/loan/class/loanschedule.class.php
-
-		-
-			message: '#^Negated boolean expression is always true\.$#'
-			identifier: booleanNot.alwaysTrue
-			count: 1
-			path: ../../../htdocs/loan/class/paymentloan.class.php
 
 		-
 			message: '#^Property PaymentLoan\:\:\$amount_capital \(float\|int\) in isset\(\) is not nullable\.$#'
@@ -32629,20 +32605,8 @@ parameters:
 			path: ../../../htdocs/website/index.php
 
 		-
-			message: '#^Comparison operation "\>\=" between 1 and 0 is always true\.$#'
-			identifier: greaterOrEqual.alwaysTrue
-			count: 1
-			path: ../../../htdocs/website/samples/wrapper.php
-
-		-
 			message: '#^If condition is always false\.$#'
 			identifier: if.alwaysFalse
-			count: 3
-			path: ../../../htdocs/website/samples/wrapper.php
-
-		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
 			count: 1
 			path: ../../../htdocs/website/samples/wrapper.php
 

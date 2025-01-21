@@ -23,7 +23,7 @@
  * Copyright (C) 2018       Josep Lluis Amador      <joseplluis@lliuretic.cat>
  * Copyright (C) 2023		Joachim Kueter			<git-jk@bloxera.com>
  * Copyright (C) 2023		Nick Fragoulis
- * Copyright (C) 2024		MDW						<mdeweerd@users.noreply.github.com>
+ * Copyright (C) 2024-2025	MDW						<mdeweerd@users.noreply.github.com>
  * Copyright (C) 2024		William Mead			<william.mead@manchenumerique.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -3040,11 +3040,6 @@ class Form
 			$sql .= ' AND e.statut IN (' . $this->db->sanitize($this->db->escape(implode(',', $warehouseStatusArray))) . ')'; // Return line if product is inside the selected stock. If not, an empty line will be returned so we will count 0.
 		}
 
-		// include search in supplier ref
-		if (getDolGlobalString('MAIN_SEARCH_PRODUCT_BY_FOURN_REF')) {
-			$sql .= " LEFT JOIN " . $this->db->prefix() . "product_fournisseur_price as pfp ON p.rowid = pfp.fk_product";
-		}
-
 		//Price by customer
 		if ((getDolGlobalString('PRODUIT_CUSTOMER_PRICES') || getDolGlobalString('PRODUIT_CUSTOMER_PRICES_AND_MULTIPRICES')) && !empty($socid)) {
 			$sql .= " LEFT JOIN  " . $this->db->prefix() . "product_customer_price as pcp ON pcp.fk_soc=" . ((int) $socid) . " AND pcp.fk_product=p.rowid";
@@ -3110,6 +3105,8 @@ class Form
 		$sql .= $hookmanager->resPrint;
 		// Add criteria on ref/label
 		if ($filterkey != '') {
+			$sqlSupplierSearch= '';
+
 			$sql .= ' AND (';
 			$prefix = !getDolGlobalString('PRODUCT_DONOTSEARCH_ANYWHERE') ? '%' : ''; // Can use index if PRODUCT_DONOTSEARCH_ANYWHERE is on
 			// For natural search
@@ -3135,8 +3132,11 @@ class Form
 						$sql .= " OR pl.description LIKE '" . $this->db->escape($prefix . $crit) . "%'";
 					}
 				}
+
+				// include search in supplier ref
 				if (getDolGlobalString('MAIN_SEARCH_PRODUCT_BY_FOURN_REF')) {
-					$sql .= " OR pfp.ref_fourn LIKE '" . $this->db->escape($prefix . $crit) . "%'";
+					$sqlSupplierSearch .= !empty($sqlSupplierSearch) ? ' OR ':'';
+					$sqlSupplierSearch .= " pfp.ref_fourn LIKE '" . $this->db->escape($prefix . $crit) . "%'";
 				}
 				$sql .= ")";
 				$i++;
@@ -3147,6 +3147,15 @@ class Form
 			if (isModEnabled('barcode')) {
 				$sql .= " OR p.barcode LIKE '" . $this->db->escape($prefix . $filterkey) . "%'";
 			}
+
+			// include search in supplier ref
+			if (getDolGlobalString('MAIN_SEARCH_PRODUCT_BY_FOURN_REF')) {
+				$sql .= " OR EXISTS (SELECT pfp.fk_product FROM " . $this->db->prefix() . "product_fournisseur_price as pfp WHERE p.rowid = pfp.fk_product";
+				$sql .= " AND (";
+				$sql .= $sqlSupplierSearch;
+				$sql .= "))";
+			}
+
 			$sql .= ')';
 		}
 		if (count($warehouseStatusArray)) {
@@ -6906,11 +6915,30 @@ class Form
 	public function load_tva($htmlname = 'tauxtva', $selectedrate = '', $societe_vendeuse = null, $societe_acheteuse = null, $idprod = 0, $info_bits = 0, $type = '', $options_only = false, $mode = 0, $type_vat = 0)
 	{
 		// phpcs:enable
-		global $langs, $mysoc;
+		global $langs, $mysoc, $hookmanager;
 
 		$langs->load('errors');
 
 		$return = '';
+		// Bypass the default method
+		$hookmanager->initHooks(array('commonobject'));
+		$info_bits == 1 ? $is_npr = 1 : $is_npr = 0;
+		$parameters = array(
+			'seller' => $societe_vendeuse,
+			'buyer' => $societe_acheteuse,
+			'idprod' => $idprod,
+			'is_npr' => $is_npr,
+			'type' => $type,
+			'options_only' => $options_only,
+			'mode' => $mode,
+			'type_vat' => $type_vat
+		);
+		$reshook = $hookmanager->executeHooks('load_tva', $parameters);
+		if ($reshook > 0) {
+			return $hookmanager->resPrint;
+		} elseif ($reshook === 0) {
+			$return .= $hookmanager->resPrint;
+		}
 
 		// Define defaultnpr, defaultttx and defaultcode
 		$defaultnpr = ($info_bits & 0x01);
@@ -9044,7 +9072,7 @@ class Form
 	 */
 	public static function selectArrayAjax($htmlname, $url, $id = '', $moreparam = '', $moreparamtourl = '', $disabled = 0, $minimumInputLength = 1, $morecss = '', $callurlonselect = 0, $placeholder = '', $acceptdelayedhtml = 0)
 	{
-		global $conf, $langs;
+		global $conf;
 		global $delayedhtmlcontent;    // Will be used later outside of this function
 
 		// TODO Use an internal dolibarr component instead of select2
@@ -9091,9 +9119,9 @@ class Form
 				    		},
 				    		cache: true
 				    	},
-		 				language: select2arrayoflanguage,
+		 				language: (typeof select2arrayoflanguage === \'undefined\') ? \'en\' : select2arrayoflanguage,
 						containerCssClass: \':all:\',					/* Line to add class from the original SELECT propagated to the new <span class="select2-selection...> tag */
-					    placeholder: "' . dol_escape_js($placeholder) . '",
+					    placeholder: \'' . dol_escape_js($placeholder) . '\',
 				    	escapeMarkup: function (markup) { return markup; }, 	// let our custom formatter work
 				    	minimumInputLength: ' . ((int) $minimumInputLength) . ',
 				        formatResult: function (result, container, query, escapeMarkup) {
@@ -9104,9 +9132,9 @@ class Form
 	                ' . ($callurlonselect ? '
 	                /* Code to execute a GET when we select a value */
 	                $(".' . $htmlname . '").change(function() {
-				    	var selected = $(".' . $htmlname . '").val();
+				    	var selected = $(\'.' . dol_escape_js($htmlname) . '\').val();
 	                	console.log("We select in selectArrayAjax the entry "+selected)
-				        $(".' . $htmlname . '").val("");  /* reset visible combo value */
+				        $(\'.' . dol_escape_js($htmlname) . '\').val("");  /* reset visible combo value */
 	    			    $.each( saveRemoteData, function( key, value ) {
 	    				        if (key == selected)
 	    			            {
@@ -9149,7 +9177,7 @@ class Form
 	 */
 	public static function selectArrayFilter($htmlname, $array, $id = '', $moreparam = '', $disableFiltering = 0, $disabled = 0, $minimumInputLength = 1, $morecss = '', $callurlonselect = 0, $placeholder = '', $acceptdelayedhtml = 0, $textfortitle = '')
 	{
-		global $conf, $langs;
+		global $conf;
 		global $delayedhtmlcontent;    // Will be used later outside of this function
 
 		// TODO Use an internal dolibarr component instead of select2
@@ -9179,13 +9207,13 @@ class Form
 
 					' . ($callurlonselect ? 'var saveRemoteData = ' . json_encode($array) . ';' : '') . '
 
-					$(".' . $htmlname . '").select2({
+					$(\'.' . dol_escape_js($htmlname) . '\').select2({
 						data: data,
-						language: select2arrayoflanguage,
+						language: (typeof select2arrayoflanguage === \'undefined\') ? \'en\' : select2arrayoflanguage,
 						containerCssClass: \':all:\',					/* Line to add class from the original SELECT propagated to the new <span class="select2-selection...> tag */
-						placeholder: "' . dol_escape_js($placeholder) . '",
+						placeholder: \'' . dol_escape_js($placeholder) . '\',
 						escapeMarkup: function (markup) { return markup; }, 	// let our custom formatter work
-						minimumInputLength: ' . $minimumInputLength . ',
+						minimumInputLength: ' . ((int) $minimumInputLength) . ',
 						formatResult: function (result, container, query, escapeMarkup) {
 							return escapeMarkup(result.text);
 						},
@@ -9224,11 +9252,11 @@ class Form
 
 					' . ($callurlonselect ? '
 					/* Code to execute a GET when we select a value */
-					$(".' . $htmlname . '").change(function() {
-						var selected = $(".' . $htmlname . '").val();
+					$(\'.' . dol_escape_js($htmlname) . '\').change(function() {
+						var selected = $(\'.' . dol_escape_js($htmlname) . '\').val();
 						console.log("We select "+selected)
 
-						$(".' . $htmlname . '").val("");  /* reset visible combo value */
+						$(\'.' . dol_escape_js($htmlname) . '\').val("");  /* reset visible combo value */
 						$.each( saveRemoteData, function( key, value ) {
 							if (key == selected)
 							{
@@ -9357,7 +9385,7 @@ class Form
 				}
 				$out .= '}' . "\n";
 				$out .= '$(document).ready(function () {
-							$(\'#' . $htmlname . '\').' . $tmpplugin . '({';
+							$(\'#' . dol_escape_js($htmlname) . '\').' . $tmpplugin . '({';
 				if ($placeholder) {
 					$out .= '
 								placeholder: {
@@ -9367,33 +9395,34 @@ class Form
 				}
 				$out .= '		dir: \'ltr\',
 								containerCssClass: \':all:\',					/* Line to add class of origin SELECT propagated to the new <span class="select2-selection...> tag (ko with multiselect) */
-								dropdownCssClass: \'' . $morecss . '\',				/* Line to add class on the new <span class="select2-selection...> tag (ok with multiselect). Need full version of select2. */
+								dropdownCssClass: \'' . dol_escape_js($morecss) . '\',				/* Line to add class on the new <span class="select2-selection...> tag (ok with multiselect). Need full version of select2. */
 								// Specify format function for dropdown item
 								formatResult: formatResult,
 							 	templateResult: formatResult,		/* For 4.0 */
 								escapeMarkup: function (markup) { return markup; }, 	// let our custom formatter work
 								// Specify format function for selected item
 								formatSelection: formatSelection,
-							 	templateSelection: formatSelection		/* For 4.0 */
+							 	templateSelection: formatSelection,		/* For 4.0 */
+							 	language: (typeof select2arrayoflanguage === \'undefined\') ? \'en\' : select2arrayoflanguage
 							});
 
 							/* Add also morecss to the css .select2 that is after the #htmlname, for component that are show dynamically after load, because select2 set
 								 the size only if component is not hidden by default on load */
-							$(\'#' . $htmlname . ' + .select2\').addClass(\'' . $morecss . '\');
+							$(\'#' . dol_escape_js($htmlname) . ' + .select2\').addClass(\'' . dol_escape_js($morecss) . '\');
 						});' . "\n";
 			} elseif ($addjscombo == 2 && !defined('DISABLE_MULTISELECT')) {
 				// Add other js lib
 				// TODO external lib multiselect/jquery.multi-select.js must have been loaded to use this multiselect plugin
 				// ...
-				$out .= 'console.log(\'addjscombo=2 for htmlname=' . $htmlname . '\');';
+				$out .= 'console.log(\'addjscombo=2 for htmlname=' . dol_escape_js($htmlname) . '\');';
 				$out .= '$(document).ready(function () {
-							$(\'#' . $htmlname . '\').multiSelect({
+							$(\'#' . dol_escape_js($htmlname) . '\').multiSelect({
 								containerHTML: \'<div class="multi-select-container">\',
 								menuHTML: \'<div class="multi-select-menu">\',
-								buttonHTML: \'<span class="multi-select-button ' . $morecss . '">\',
+								buttonHTML: \'<span class="multi-select-button ' . dol_escape_js($morecss) . '">\',
 								menuItemHTML: \'<label class="multi-select-menuitem">\',
 								activeClass: \'multi-select-container--open\',
-								noneText: \'' . $placeholder . '\'
+								noneText: \'' . dol_escape_js($placeholder) . '\'
 							});
 						})';
 			}
