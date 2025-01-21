@@ -4743,19 +4743,21 @@ if ($action == 'create') {
 			print ' <span class="opacitymediumbycolor paddingleft">'.$langs->transnoentities("CorrectInvoice", $facusing->getNomUrl(1, '', 32)).'</span>';
 		}
 
-		$facidavoir = $object->getListIdAvoirFromInvoice();
-		if (count($facidavoir) > 0) {
+		// Retrieve credit note ids
+		$object->getListIdAvoirFromInvoice();
+
+		if (!empty($object->creditnote_ids)) {
 			print ' <span class="opacitymediumbycolor paddingleft">'.$langs->transnoentities("InvoiceHasAvoir");
 			$i = 0;
-			foreach ($facidavoir as $id) {
+			foreach ($object->creditnote_ids as $invoiceid) {
 				if ($i == 0) {
 					print ' ';
 				} else {
 					print ',';
 				}
-				$facavoir = new Facture($db);
-				$facavoir->fetch($id);
-				print $facavoir->getNomUrl(1, '', 32);
+				$creditnote = new Facture($db);
+				$creditnote->fetch($invoiceid);
+				print $creditnote->getNomUrl(1, '', 32);
 			}
 			print '</span>';
 		}
