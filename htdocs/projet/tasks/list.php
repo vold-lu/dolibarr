@@ -692,7 +692,7 @@ if ($search_task_progress != '') {
 	$param .= '&search_task_progress='.urlencode($search_task_progress);
 }
 if ($search_task_status != '') {
-	$param .= '&search_task_status='.urlencode($search_task_status);
+	$param .= '&search_task_status='.urlencode((string)$search_task_status);
 }
 if ($search_societe != '') {
 	$param .= '&search_societe='.urlencode($search_societe);

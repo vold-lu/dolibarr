@@ -668,10 +668,6 @@ class Task extends CommonObjectLine
 			return -1;
 		}
 
-		if (isset($this->status)) {
-			$this->status = (int) $this->status;
-		}
-
 		// Check parameters
 		// Put here code to add control on parameters values
 
