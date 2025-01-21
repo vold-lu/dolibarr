@@ -386,6 +386,21 @@ class Task extends CommonObjectLine
 	public function __construct($db)
 	{
 		$this->db = $db;
+		// list of status of the task
+		$this->labelStatus = array(
+			0 => 'Draft',
+			1 => 'Validated',
+			2 => 'In progress',
+			3 => 'Closed',
+			4 => 'Transferred',
+		);
+		$this->labelStatusShort = array(
+			0 => 'Draft',
+			1 => 'Validated',
+			2 => 'In progress',
+			3 => 'Closed',
+			4 => 'Transferred',
+		);
 	}
 
 
@@ -2515,18 +2530,6 @@ class Task extends CommonObjectLine
 	{
 		// phpcs:enable
 		global $langs;
-
-		// list of status of the task
-		$this->labelStatus[0] = 'Draft';
-		$this->labelStatus[1] = 'Validated';
-		$this->labelStatus[2] = 'In progress';
-		$this->labelStatus[3] = 'Closed';
-		$this->labelStatus[4] = 'Transfered';
-		$this->labelStatusShort[0] = 'Draft';
-		$this->labelStatusShort[1] = 'Validated';
-		$this->labelStatusShort[2] = 'In progress';
-		$this->labelStatusShort[3] = 'Closed';
-		$this->labelStatusShort[4] = 'Transfered';
 
 		if ($mode == 0) {
 			return $langs->trans($this->labelStatus[$status]);

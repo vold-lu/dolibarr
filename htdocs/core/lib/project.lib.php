@@ -870,6 +870,13 @@ function projectLinesa(&$inc, $parent, &$lines, &$level, $var, $showproject, &$t
 					print '</td>';
 				}
 
+				// Status
+				if (count($arrayfields) > 0 && !empty($arrayfields['t.fk_statut']['checked'])) {
+					print '<td class="center">';
+					print $taskstatic->getLibStatut(4);
+					print '</td>';
+				}
+
 				if ($showbilltime) {
 					// Time not billed
 					if (count($arrayfields) > 0 && !empty($arrayfields['t.tobill']['checked'])) {
@@ -952,13 +959,6 @@ function projectLinesa(&$inc, $parent, &$lines, &$level, $var, $showproject, &$t
 					} else {
 						print '<span>'.$langs->trans('No').'</span>';
 					}
-					print '</td>';
-				}
-
-				// Status
-				if (count($arrayfields) > 0 && !empty($arrayfields['t.fk_statut']['checked'])) {
-					print '<td class="center">';
-					print $taskstatic->getLibStatut(4);
 					print '</td>';
 				}
 

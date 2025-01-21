@@ -98,7 +98,7 @@ $search_progresscalc = GETPOST('search_progresscalc');
 $search_progressdeclare = GETPOST('search_progressdeclare');
 $search_task_budget_amount = GETPOST('search_task_budget_amount');
 $search_task_billable = GETPOST('search_task_billable');
-$search_fk_statut = GETPOSTINT('search_fk_statut');
+$search_status = GETPOSTINT('search_status');
 
 $search_date_start_startmonth = GETPOSTINT('search_date_start_startmonth');
 $search_date_start_startyear = GETPOSTINT('search_date_start_startyear');
@@ -182,9 +182,9 @@ $arrayfields = array(
 	't.progress_calculated' => array('label' => "ProgressCalculated", 'checked' => 1, 'position' => 8),
 	't.progress' => array('label' => "ProgressDeclared", 'checked' => 1, 'position' => 9),
 	't.progress_summary' => array('label' => "TaskProgressSummary", 'checked' => 1, 'position' => 10),
-	't.budget_amount' => array('label' => "Budget", 'checked' => 0, 'position' => 11),
-	'c.assigned' => array('label' => "TaskRessourceLinks", 'checked' => 1, 'position' => 12),
-	't.fk_statut' => array('label' => "Status", 'checked' => 1, 'position' => 12),
+	't.fk_statut' => array('label' => "Status", 'checked' => 1, 'position' => 11),
+	't.budget_amount' => array('label' => "Budget", 'checked' => 0, 'position' => 12),
+	'c.assigned' => array('label' => "TaskRessourceLinks", 'checked' => 1, 'position' => 13),
 
 );
 if ($object->usage_bill_time) {
@@ -251,7 +251,7 @@ if (empty($reshook)) {
 		$search_progressdeclare = '';
 		$search_task_budget_amount = '';
 		$search_task_billable = '';
-		$search_fk_statut = '';
+		$search_status = -1;
 		$toselect = array();
 		$search_array_options = array();
 		$search_date_start_startmonth = "";
@@ -330,14 +330,14 @@ if (!empty($search_progresscalc)) {
 	$morewherefilterarray[] = '(planned_workload IS NULL OR planned_workload = 0 OR '.natural_search('ROUND(100 * duration_effective / planned_workload, 2)', $search_progresscalc, 1, 1).')';
 	//natural_search('round(100 * $line->duration_effective / $line->planned_workload,2)', $filterprogresscalc, 1, 1).' {return 1;} else {return 0;}';
 }
+if ($search_status > -1) {
+	$morewherefilterarray[] = " t.fk_statut = ".$search_status;
+}
 if ($search_task_budget_amount) {
 	$morewherefilterarray[] = natural_search('t.budget_amount', $search_task_budget_amount, 1, 1);
 }
 if ($search_task_billable) {
 	$morewherefilterarray[] = " t.billable = ".($search_task_billable == "yes" ? 1 : 0);
-}
-if ($search_fk_statut) {
-	$morewherefilterarray[] = " t.fk_statut = ".$search_fk_statut;
 }
 //var_dump($morewherefilterarray);
 
@@ -578,6 +578,9 @@ if ($id > 0 || !empty($ref)) {
 	}
 	if ($search_progressdeclare) {
 		$param .= '&search_progressdeclare='.urlencode($search_progressdeclare);
+	}
+	if ($search_status) {
+		$param .= '&search_status='.urlencode($search_status);
 	}
 	if ($search_task_budget_amount) {
 		$param .= '&search_task_budget_amount='.urlencode($search_task_budget_amount);
@@ -1057,6 +1060,16 @@ if ($action == 'create' && $user->hasRight('projet', 'creer') && (empty($object-
 		print '<td class="liste_titre right"></td>';
 	}
 
+	if (!empty($arrayfields['t.fk_statut']['checked'])) {
+		print '<td class="liste_titre center">';
+		$arrayofstatus = array();
+		foreach ($taskstatic->labelStatusShort as $key => $val) {
+			$arrayofstatus[$key] = $langs->trans($val);
+		}
+		print $form->selectarray('search_status', $arrayofstatus, $search_status, 1, 0, 0, '', 0, 0, 0, '', 'maxwidth100');
+		print '</td>';
+	}
+
 	if ($object->usage_bill_time) {
 		if (!empty($arrayfields['t.tobill']['checked'])) {
 			print '<td class="liste_titre right">';
@@ -1083,11 +1096,6 @@ if ($action == 'create' && $user->hasRight('projet', 'creer') && (empty($object-
 	if (!empty($arrayfields['t.billable']['checked'])) {
 		print '<td class="liste_titre center">';
 		print $form->selectyesno('search_task_billable', $search_task_billable, 0, false, 1);
-		print '</td>';
-	}
-	if (!empty($arrayfields['t.fk_statut']['checked'])) {
-		print '<td class="liste_titre center">';
-		//TODO: add status filter
 		print '</td>';
 	}
 
@@ -1147,6 +1155,9 @@ if ($action == 'create' && $user->hasRight('projet', 'creer') && (empty($object-
 	if (!empty($arrayfields['t.progress_summary']['checked'])) {
 		print_liste_field_titre($arrayfields['t.progress_summary']['label'], $_SERVER["PHP_SELF"], "", '', $param, '', $sortfield, $sortorder, 'center ', '', 1);
 	}
+	if (!empty($arrayfields['t.fk_statut']['checked'])) {
+		print_liste_field_titre($arrayfields['t.fk_statut']['label'], $_SERVER["PHP_SELF"], "", '', $param, '', $sortfield, $sortorder, 'center ', '');
+	}
 	if ($object->usage_bill_time) {
 		if (!empty($arrayfields['t.tobill']['checked'])) {
 			print_liste_field_titre($arrayfields['t.tobill']['label'], $_SERVER["PHP_SELF"], "t.tobill", '', $param, '', $sortfield, $sortorder, 'right ');
@@ -1168,9 +1179,6 @@ if ($action == 'create' && $user->hasRight('projet', 'creer') && (empty($object-
 		print_liste_field_titre($arrayfields['t.billable']['label'], $_SERVER["PHP_SELF"], "", '', $param, '', $sortfield, $sortorder, 'center ', '');
 	}
 
-	if (!empty($arrayfields['t.fk_statut']['checked'])) {
-		print_liste_field_titre($arrayfields['t.fk_statut']['label'], $_SERVER["PHP_SELF"], "", '', $param, '', $sortfield, $sortorder, 'center ', '');
-	}
 	// Extra fields
 	$disablesortlink = 1;
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_title.tpl.php';
