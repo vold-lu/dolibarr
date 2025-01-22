@@ -62,7 +62,12 @@ if (!$user->hasRight('loan', 'write')) {
 $loan = new Loan($db);
 $loan->fetch($chid);
 
+$line_id = 0;
 $echance = 0;
+$amount_capital = 0;
+$amount_insurance = 0;
+$amount_interest = 0;
+
 $ls = new LoanSchedule($db);
 // grab all loanschedule
 $res = $ls->fetchAll($chid);
