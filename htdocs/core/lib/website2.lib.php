@@ -290,6 +290,8 @@ function dolSavePageContent($filetpl, Website $object, WebsitePage $objectpage, 
 					}
 
 					$tmpshortlangcode = preg_replace('/[_-].*$/', '', $object->lang); // en_US or en-US -> en
+					$canonicalurladdidlang = '<?php echo GETPOSTINT("id") ? "?id=".GETPOSTINT("id")."&" : "?" ?>';
+					$canonicalurladdidlang .= 'l='.$tmpshortlangcode;
 					$tplcontent .= '<link rel="alternate" hreflang="'.$tmpshortlangcode.'" href="<?php echo $website->virtualhost; ?>'.$canonicalurl.$canonicalurladdidlang.'" />'."\n";
 				}
 			}
