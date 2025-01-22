@@ -174,6 +174,7 @@ function dolSavePageContent($filetpl, Website $object, WebsitePage $objectpage, 
 
 	$tplcontent = '';
 	if (!isset($originalcontentonly)) {
+		// If we want to generate a page with some code to manage PHP content
 		$tplcontent .= "<?php // BEGIN PHP\n";
 		$tplcontent .= '$websitekey=basename(__DIR__); if (empty($websitepagefile)) $websitepagefile=__FILE__;'."\n";
 		$tplcontent .= "if (! defined('USEDOLIBARRSERVER') && ! defined('USEDOLIBARREDITOR')) {\n";
@@ -195,67 +196,89 @@ function dolSavePageContent($filetpl, Website $object, WebsitePage $objectpage, 
 		$tplcontent .= '<meta http-equiv="content-type" content="text/html; charset=utf-8" />'."\n";
 		$tplcontent .= '<meta name="robots" content="index, follow" />'."\n";
 		$tplcontent .= '<meta name="viewport" content="width=device-width, initial-scale=1.0">'."\n";
-		$tplcontent .= '<meta name="keywords" content="'.dol_string_nohtmltag($objectpage->keywords).'" />'."\n";
+		$tplcontent .= '<meta name="keywords" content="'.dol_string_nohtmltag($objectpage->keywords, 0, 'UTF-8').'" />'."\n";
 		$tplcontent .= '<meta name="title" content="'.dol_string_nohtmltag($objectpage->title, 0, 'UTF-8').'" />'."\n";
 		$tplcontent .= '<meta name="description" content="'.dol_string_nohtmltag($objectpage->description, 0, 'UTF-8').'" />'."\n";
 		$tplcontent .= '<meta name="generator" content="'.DOL_APPLICATION_TITLE.' '.DOL_VERSION.' (https://www.dolibarr.org)" />'."\n";
-		$tplcontent .= '<meta name="dolibarr:pageid" content="'.dol_string_nohtmltag((string) $objectpage->id).'" />'."\n";
+		$tplcontent .= '<meta name="dolibarr:pageid" content="'.((int) $objectpage->id).'" />'."\n";
 
 		// Add favicon
 		if (in_array($objectpage->type_container, array('page', 'blogpost'))) {
 			$tplcontent .= '<link rel="icon" type="image/png" href="/favicon.png" />'."\n";
 		}
 
-		// Add canonical reference
+		// Add the link of the canonical reference
+		// Note: $object is website, $objectpage is website page
 		if ($object->virtualhost) {
-			$tplcontent .= '<link rel="canonical" href="'.(($objectpage->id == $object->fk_default_home) ? '/' : (($shortlangcode != substr($object->lang, 0, 2) ? '/'.$shortlangcode : '').'/'.$objectpage->pageurl.'.php')).'" />'."\n";
-		}
-		// Add translation reference (main language)
-		if ($object->isMultiLang()) {
-			// Add page "translation of"
-			$translationof = $objectpage->fk_page;
-			if ($translationof) {
-				$tmppage = new WebsitePage($db);
-				$tmppage->fetch($translationof);
-				if ($tmppage->id > 0) {
-					$tmpshortlangcode = '';
-					if ($tmppage->lang) {
-						$tmpshortlangcode = preg_replace('/[_-].*$/', '', $tmppage->lang); // en_US or en-US -> en
-					}
-					if (empty($tmpshortlangcode)) {
-						$tmpshortlangcode = preg_replace('/[_-].*$/', '', $object->lang); // en_US or en-US -> en
-					}
-					if ($tmpshortlangcode != $shortlangcode) {
-						$tplcontent .= '<link rel="alternate" hreflang="'.$tmpshortlangcode.'" href="<?php echo $website->virtualhost; ?>'.($object->fk_default_home == $tmppage->id ? '/' : (($tmpshortlangcode != substr($object->lang, 0, 2)) ? '/'.$tmpshortlangcode : '').'/'.$tmppage->pageurl.'.php').'" />'."\n";
-					}
+			$canonicalurladdid = '';
+			if ($objectpage->lang) {	// A language is forced on the page, it means we may have other langueg files with hard links
+				$canonicalurl = (($objectpage->id == $object->fk_default_home) ? '/' : (($shortlangcode != substr($object->lang, 0, 2) ? '/'.$shortlangcode : '').'/'.$objectpage->pageurl.'.php'));
+			} else {					// No language forced, it means the canonical is the one with
+				$canonicalurl = '/'.$objectpage->pageurl.'.php';
+
+				if ($object->lang && $object->isMultiLang()) {
+					$tmpshortlangcode = preg_replace('/[_-].*$/', '', $object->lang); // en_US or en-US -> en
+					$canonicalurl .= '?l=<?php echo $weblangs->shortlang ? $weblangs->shortlang : "'.$tmpshortlangcode.'"; ?>';
+					// Add parameter ID required to be unique/canonical
+					$canonicalurladdid = '<?php echo GETPOSTINT("id") ? "&id=".GETPOSTINT("id") : "" ?>';
+				} else {
+					// Add parameter ID required to be unique/canonical
+					$canonicalurladdid = '<?php echo GETPOSTINT("id") ? "?id=".GETPOSTINT("id") : "" ?>';
 				}
 			}
 
-			// Add "has translation pages"
-			$sql = "SELECT rowid as id, lang, pageurl from ".MAIN_DB_PREFIX.'website_page where fk_page IN ('.$db->sanitize($objectpage->id.($translationof ? ", ".$translationof : '')).")";
-			$resql = $db->query($sql);
-			if ($resql) {
-				$num_rows = $db->num_rows($resql);
-				if ($num_rows > 0) {
-					while ($obj = $db->fetch_object($resql)) {
+			$tplcontent .= '<link rel="canonical" href="'.$canonicalurl.$canonicalurladdid.'" />'."\n";
+		}
+
+		// Add the link of alternate translation reference
+		if ($object->isMultiLang()) {	// If website has other languages to support
+			if ($objectpage->lang) {	// If the page has been set to a given language
+				// Add page "translation of"
+				$translationof = $objectpage->fk_page;
+				if ($translationof) {
+					$tmppage = new WebsitePage($db);
+					$tmppage->fetch($translationof);
+					if ($tmppage->id > 0) {
 						$tmpshortlangcode = '';
-						if ($obj->lang) {
-							$tmpshortlangcode = preg_replace('/[_-].*$/', '', $obj->lang); // en_US or en-US -> en
+						if ($tmppage->lang) {
+							$tmpshortlangcode = preg_replace('/[_-].*$/', '', $tmppage->lang); // en_US or en-US -> en
+						}
+						if (empty($tmpshortlangcode)) {
+							$tmpshortlangcode = preg_replace('/[_-].*$/', '', $object->lang); // en_US or en-US -> en
 						}
 						if ($tmpshortlangcode != $shortlangcode) {
-							$tplcontent .= '<link rel="alternate" hreflang="'.$tmpshortlangcode.'" href="<?php echo $website->virtualhost; ?>'.($object->fk_default_home == $obj->id ? '/' : (($tmpshortlangcode != substr($object->lang, 0, 2) ? '/'.$tmpshortlangcode : '')).'/'.$obj->pageurl.'.php').'" />'."\n";
+							$tplcontent .= '<link rel="alternate" hreflang="'.$tmpshortlangcode.'" href="<?php echo $website->virtualhost; ?>'.($object->fk_default_home == $tmppage->id ? '/' : (($tmpshortlangcode != substr($object->lang, 0, 2)) ? '/'.$tmpshortlangcode : '').'/'.$tmppage->pageurl.'.php').'" />'."\n";
 						}
 					}
 				}
+
+				// Add "has translation pages"
+				$sql = "SELECT rowid as id, lang, pageurl from ".MAIN_DB_PREFIX.'website_page where fk_page IN ('.$db->sanitize($objectpage->id.($translationof ? ", ".$translationof : '')).")";
+				$resql = $db->query($sql);
+				if ($resql) {
+					$num_rows = $db->num_rows($resql);
+					if ($num_rows > 0) {
+						while ($obj = $db->fetch_object($resql)) {
+							$tmpshortlangcode = '';
+							if ($obj->lang) {
+								$tmpshortlangcode = preg_replace('/[_-].*$/', '', $obj->lang); // en_US or en-US -> en
+							}
+							if ($tmpshortlangcode != $shortlangcode) {
+								$tplcontent .= '<link rel="alternate" hreflang="'.$tmpshortlangcode.'" href="<?php echo $website->virtualhost; ?>'.($object->fk_default_home == $obj->id ? '/' : (($tmpshortlangcode != substr($object->lang, 0, 2) ? '/'.$tmpshortlangcode : '')).'/'.$obj->pageurl.'.php').'" />'."\n";
+							}
+						}
+					}
+				} else {
+					dol_print_error($db);
+				}
+
+				// Add myself
+				$tplcontent .= '<?php if ($_SERVER["PHP_SELF"] == "'.(($object->fk_default_home == $objectpage->id) ? '/' : (($shortlangcode != substr($object->lang, 0, 2)) ? '/'.$shortlangcode : '')).'/'.$objectpage->pageurl.'.php") { ?>'."\n";
+				$tplcontent .= '<link rel="alternate" hreflang="'.$shortlangcode.'" href="<?php echo $website->virtualhost; ?>'.(($object->fk_default_home == $objectpage->id) ? '/' : (($shortlangcode != substr($object->lang, 0, 2)) ? '/'.$shortlangcode : '').'/'.$objectpage->pageurl.'.php').'" />'."\n";
+
+				$tplcontent .= '<?php } ?>'."\n";
 			} else {
-				dol_print_error($db);
 			}
-
-			// Add myself
-			$tplcontent .= '<?php if ($_SERVER["PHP_SELF"] == "'.(($object->fk_default_home == $objectpage->id) ? '/' : (($shortlangcode != substr($object->lang, 0, 2)) ? '/'.$shortlangcode : '')).'/'.$objectpage->pageurl.'.php") { ?>'."\n";
-			$tplcontent .= '<link rel="alternate" hreflang="'.$shortlangcode.'" href="<?php echo $website->virtualhost; ?>'.(($object->fk_default_home == $objectpage->id) ? '/' : (($shortlangcode != substr($object->lang, 0, 2)) ? '/'.$shortlangcode : '').'/'.$objectpage->pageurl.'.php').'" />'."\n";
-
-			$tplcontent .= '<?php } ?>'."\n";
 		}
 		// Add manifest.json. Do we have to add it only on home page ?
 		$tplcontent .= '<?php if ($website->use_manifest) { print \'<link rel="manifest" href="/manifest.json.php" />\'."\n"; } ?>'."\n";
@@ -278,7 +301,9 @@ function dolSavePageContent($filetpl, Website $object, WebsitePage $objectpage, 
 		$tplcontent .= '</html>'."\n";
 
 		$tplcontent .= '<?php // BEGIN PHP'."\n";
-		$tplcontent .= '$tmp = ob_get_contents(); ob_end_clean();'."\n";
+		$tplcontent .= '$tmp = ob_get_contents(); ob_end_clean();'."\n";	// replace with ob_get_clean ?
+
+		// Old method for custom SEO
 		if (strpos($objectpage->content, '$__PAGE__TITLE__') !== false) {
 			$tplcontent .= '$tmp = preg_replace("/<title>.*?<\/title>/s", "<title>" . dol_escape_htmltag($__PAGE__TITLE__) . "</title>", $tmp);'."\n";
 			$tplcontent .= '$tmp = preg_replace("/<meta name=\"title\" content=\".*?\" \/>/s", "<meta name=\"title\" content=\"" . dol_string_nohtmltag($__PAGE__TITLE__) . "\"  />", $tmp);';
@@ -289,7 +314,19 @@ function dolSavePageContent($filetpl, Website $object, WebsitePage $objectpage, 
 		if (strpos($objectpage->content, '$__PAGE__DESC__') !== false) {
 			$tplcontent .= '$tmp = preg_replace("/<meta name=\"description\" content=\".*?\" \/>/s", "<meta name=\"description\" content=\"" . dol_string_nohtmltag($__PAGE__DESC__) . "\"  />", $tmp);';
 		}
-		$tplcontent .= 'dolWebsiteOutput($tmp, "html", '.$objectpage->id.'); dolWebsiteIncrementCounter('.$object->id.', "'.$objectpage->type_container.'", '.$objectpage->id.');'."\n";
+		// New method for custom SEO
+		if (strpos($objectpage->content, 'define("__SEO_PAGE_TITLE__")') !== false) {
+			$tplcontent .= '$tmp = preg_replace("/<title>.*?<\/title>/s", "<title>" . dol_escape_htmltag(constant("__SEO_PAGE_TITLE__")) . "</title>", $tmp);'."\n";
+			$tplcontent .= '$tmp = preg_replace("/<meta name=\"title\" content=\".*?\" \/>/s", "<meta name=\"title\" content=\"" . dol_string_nohtmltag(constant("__SEO_PAGE_TITLE__")) . "\"  />", $tmp);';
+		}
+		if (strpos($objectpage->content, 'define("__SEO_PAGE_KEYWORDS__")') !== false) {
+			$tplcontent .= '$tmp = preg_replace("/<meta name=\"keywords\" content=\".*?\" \/>/s", "<meta name=\"keywords\" content=\"" . dol_string_nohtmltag(constant("__SEO_PAGE_KEYWORDS__")) . "\"  />", $tmp);';
+		}
+		if (strpos($objectpage->content, 'define("__SEO_PAGE_DESC__")') !== false) {
+			$tplcontent .= '$tmp = preg_replace("/<meta name=\"description\" content=\".*?\" \/>/s", "<meta name=\"description\" content=\"" . dol_string_nohtmltag(constant("__SEO_PAGE_DESC__")) . "\"  />", $tmp);';
+		}
+
+		$tplcontent .= 'dolWebsiteOutput($tmp, "html", '.((int) $objectpage->id).'); dolWebsiteIncrementCounter('.((int) $object->id).', "'.$objectpage->type_container.'", '.((int) $objectpage->id).');'."\n";
 		$tplcontent .= "// END PHP ?>\n";
 	} else {
 		$tplcontent .= "<?php // BEGIN PHP\n";
