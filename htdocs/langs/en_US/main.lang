@@ -1253,6 +1253,7 @@ CommercialAffected=Sales representative assigned
 CommercialsDisaffected=Sales representatives unlinked
 CommercialDisaffected=Sales representative unlinked
 Message=Message
+Emailing=Emailing
 Progression=Progress
 YourMessage=Your message
 YourMessageHasBeenReceived=Your message has been received. We will answer or contact you as soon as possible.
