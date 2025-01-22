@@ -3991,7 +3991,7 @@ class Form
 					$optstart .= ' data-up-locale="' . dol_escape_htmltag(price($objp->unitprice)) . '"';	// the price formated in user languge
 					$optstart .= ' data-discount="' . dol_escape_htmltag($outdiscount) . '"';
 					$optstart .= ' data-tvatx="' . dol_escape_htmltag(price2num($objp->tva_tx)) . '"';		// the rate with numeric international format
-					$optstart .= ' data-tvatx-formated="' . dol_escape_htmltag(price($objp->tva_tx, 0, $langs, 1, -1, 2)) . '"';	// the rate formated in user language
+					$optstart .= ' data-tvatx-formated="' . dol_escape_htmltag(price($objp->tva_tx, 0, $langs, 1, -1, 2)) . '"';	// the rate formatted in user language
 					$optstart .= ' data-default-vat-code="' . dol_escape_htmltag($objp->default_vat_code) . '"';
 					$optstart .= ' data-supplier-ref="' . dol_escape_htmltag($objp->ref_fourn) . '"';
 					if (isModEnabled('multicurrency')) {
@@ -7082,17 +7082,17 @@ class Form
 		if ($d) {
 			// Show date with popup
 			if ($usecalendar != 'combo') {
-				$formated_date = '';
+				$formatted_date = '';
 				//print "e".$set_time." t ".$conf->format_date_short;
 				if (strval($set_time) != '' && $set_time != -1) {
-					//$formated_date=dol_print_date($set_time,$conf->format_date_short);
-					$formated_date = dol_print_date($set_time, $langs->trans("FormatDateShortInput"), $gm); // FormatDateShortInput for dol_print_date / FormatDateShortJavaInput that is same for javascript
+					//$formatted_date=dol_print_date($set_time,$conf->format_date_short);
+					$formatted_date = dol_print_date($set_time, $langs->trans("FormatDateShortInput"), $gm); // FormatDateShortInput for dol_print_date / FormatDateShortJavaInput that is same for javascript
 				}
 
 				// Calendrier popup version eldy
 				if ($usecalendar == "eldy") {
 					// Input area to enter date manually
-					$retstring .= '<input id="' . $prefix . '" name="' . $prefix . '" type="text" class="maxwidthdate center" maxlength="11" value="' . $formated_date . '"';
+					$retstring .= '<input id="' . $prefix . '" name="' . $prefix . '" type="text" class="maxwidthdate center" maxlength="11" value="' . $formatted_date . '"';
 					$retstring .= ($disabled ? ' disabled' : '');
 					$retstring .= ' onChange="dpChangeDay(\'' . $prefix . '\',\'' . $langs->trans("FormatDateShortJavaInput") . '\'); "'; // FormatDateShortInput for dol_print_date / FormatDateShortJavaInput that is same for javascript
 					$retstring .= ' autocomplete="off">';
@@ -7148,7 +7148,7 @@ class Form
 
 					// Input area to enter date manually
 					$retstring .= '<div class="nowraponall inline-block divfordateinput">';
-					$retstring .= '<input id="'.$prefix.'" name="'.$prefix.'" type="text" class="maxwidthdate center" maxlength="11" value="'.$formated_date.'"';
+					$retstring .= '<input id="'.$prefix.'" name="'.$prefix.'" type="text" class="maxwidthdate center" maxlength="11" value="'.$formatted_date.'"';
 					$retstring .= ($disabled ? ' disabled' : '');
 					$retstring .= ($placeholder ? ' placeholder="' . dol_escape_htmltag($placeholder) . '"' : '');
 					$retstring .= ' onChange="dpChangeDay(\'' . dol_escape_js($prefix) . '\',\'' . dol_escape_js($langs->trans("FormatDateShortJavaInput")) . '\'); "'; // FormatDateShortInput for dol_print_date / FormatDateShortJavaInput that is same for javascript
