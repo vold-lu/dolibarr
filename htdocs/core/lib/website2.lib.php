@@ -221,11 +221,11 @@ function dolSavePageContent($filetpl, Website $object, WebsitePage $objectpage, 
 				if ($object->lang && $listofaltlang) {
 					$tmpshortlangcode = preg_replace('/[_-].*$/', '', $object->lang); // en_US or en-US -> en
 					// Add parameter ID required to be unique/canonical
-					$canonicalurladdidlang = '<?php echo GETPOSTINT("id") ? "?id=".GETPOSTINT("id")."&" : "?" ?>';
+					$canonicalurladdidlang = '<?php echo GETPOSTINT("id") ? "?id=".GETPOSTINT("id")."&" : (GETPOSTINT("cat") ? "?cat=".GETPOSTINT("cat")."&" : "?") ?>';
 					$canonicalurladdidlang .= 'l=<?php echo $weblangs->shortlang ? $weblangs->shortlang : "'.$tmpshortlangcode.'"; ?>';
 				} else {
 					// Add parameter ID required to be unique/canonical
-					$canonicalurladdidlang = '<?php echo GETPOSTINT("id") ? "?id=".GETPOSTINT("id") : "" ?>';
+					$canonicalurladdidlang = '<?php echo GETPOSTINT("id") ? "?id=".GETPOSTINT("id") : (GETPOSTINT("cat") ? "?cat=".GETPOSTINT("cat") : "") ?>';
 				}
 			}
 
@@ -284,13 +284,13 @@ function dolSavePageContent($filetpl, Website $object, WebsitePage $objectpage, 
 
 					foreach ($arrayofaltlang as $altlang) {
 						// Add parameter ID required to be unique/canonical
-						$canonicalurladdidlang = '<?php echo GETPOSTINT("id") ? "?id=".GETPOSTINT("id")."&" : "?" ?>';
+						$canonicalurladdidlang = '<?php echo GETPOSTINT("id") ? "?id=".GETPOSTINT("id")."&" : (GETPOSTINT("cat") ? "?cat=".GETPOSTINT("cat")."&" : "?") ?>';
 						$canonicalurladdidlang .= 'l='.$altlang;
 						$tplcontent .= '<link rel="alternate" hreflang="'.$altlang.'" href="<?php echo $website->virtualhost; ?>'.$canonicalurl.$canonicalurladdidlang.'" />'."\n";
 					}
 
 					$tmpshortlangcode = preg_replace('/[_-].*$/', '', $object->lang); // en_US or en-US -> en
-					$canonicalurladdidlang = '<?php echo GETPOSTINT("id") ? "?id=".GETPOSTINT("id")."&" : "?" ?>';
+					$canonicalurladdidlang = '<?php echo GETPOSTINT("id") ? "?id=".GETPOSTINT("id")."&" : (GETPOSTINT("cat") ? "?cat=".GETPOSTINT("cat")."&" : "?") ?>';
 					$canonicalurladdidlang .= 'l='.$tmpshortlangcode;
 					$tplcontent .= '<link rel="alternate" hreflang="'.$tmpshortlangcode.'" href="<?php echo $website->virtualhost; ?>'.$canonicalurl.$canonicalurladdidlang.'" />'."\n";
 				}
