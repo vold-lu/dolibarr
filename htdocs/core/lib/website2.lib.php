@@ -207,79 +207,90 @@ function dolSavePageContent($filetpl, Website $object, WebsitePage $objectpage, 
 			$tplcontent .= '<link rel="icon" type="image/png" href="/favicon.png" />'."\n";
 		}
 
+		$listofaltlang = $object->otherlang;
+
 		// Add the link of the canonical reference
 		// Note: $object is website, $objectpage is website page
 		if ($object->virtualhost) {
-			$canonicalurladdid = '';
-			if ($objectpage->lang) {	// A language is forced on the page, it means we may have other langueg files with hard links
+			$canonicalurladdidlang = '';
+			if ($objectpage->lang) {	// A language is forced on the page, it means we may have other language files with hard links into properties of page
 				$canonicalurl = (($objectpage->id == $object->fk_default_home) ? '/' : (($shortlangcode != substr($object->lang, 0, 2) ? '/'.$shortlangcode : '').'/'.$objectpage->pageurl.'.php'));
 			} else {					// No language forced, it means the canonical is the one with
 				$canonicalurl = '/'.$objectpage->pageurl.'.php';
 
-				if ($object->lang && $object->isMultiLang()) {
+				if ($object->lang && $listofaltlang) {
 					$tmpshortlangcode = preg_replace('/[_-].*$/', '', $object->lang); // en_US or en-US -> en
-					$canonicalurl .= '?l=<?php echo $weblangs->shortlang ? $weblangs->shortlang : "'.$tmpshortlangcode.'"; ?>';
 					// Add parameter ID required to be unique/canonical
-					$canonicalurladdid = '<?php echo GETPOSTINT("id") ? "&id=".GETPOSTINT("id") : "" ?>';
+					$canonicalurladdidlang = '<?php echo GETPOSTINT("id") ? "?id=".GETPOSTINT("id")."&" : "?" ?>';
+					$canonicalurladdidlang .= 'l=<?php echo $weblangs->shortlang ? $weblangs->shortlang : "'.$tmpshortlangcode.'"; ?>';
 				} else {
 					// Add parameter ID required to be unique/canonical
-					$canonicalurladdid = '<?php echo GETPOSTINT("id") ? "?id=".GETPOSTINT("id") : "" ?>';
+					$canonicalurladdidlang = '<?php echo GETPOSTINT("id") ? "?id=".GETPOSTINT("id") : "" ?>';
 				}
 			}
 
-			$tplcontent .= '<link rel="canonical" href="'.$canonicalurl.$canonicalurladdid.'" />'."\n";
-		}
+			$tplcontent .= '<link rel="canonical" href="<?php echo $website->virtualhost; ?>'.$canonicalurl.$canonicalurladdidlang.'" />'."\n";
 
-		// Add the link of alternate translation reference
-		if ($object->isMultiLang()) {	// If website has other languages to support
-			if ($objectpage->lang) {	// If the page has been set to a given language
-				// Add page "translation of"
-				$translationof = $objectpage->fk_page;
-				if ($translationof) {
-					$tmppage = new WebsitePage($db);
-					$tmppage->fetch($translationof);
-					if ($tmppage->id > 0) {
-						$tmpshortlangcode = '';
-						if ($tmppage->lang) {
-							$tmpshortlangcode = preg_replace('/[_-].*$/', '', $tmppage->lang); // en_US or en-US -> en
-						}
-						if (empty($tmpshortlangcode)) {
-							$tmpshortlangcode = preg_replace('/[_-].*$/', '', $object->lang); // en_US or en-US -> en
-						}
-						if ($tmpshortlangcode != $shortlangcode) {
-							$tplcontent .= '<link rel="alternate" hreflang="'.$tmpshortlangcode.'" href="<?php echo $website->virtualhost; ?>'.($object->fk_default_home == $tmppage->id ? '/' : (($tmpshortlangcode != substr($object->lang, 0, 2)) ? '/'.$tmpshortlangcode : '').'/'.$tmppage->pageurl.'.php').'" />'."\n";
-						}
-					}
-				}
-
-				// Add "has translation pages"
-				$sql = "SELECT rowid as id, lang, pageurl from ".MAIN_DB_PREFIX.'website_page where fk_page IN ('.$db->sanitize($objectpage->id.($translationof ? ", ".$translationof : '')).")";
-				$resql = $db->query($sql);
-				if ($resql) {
-					$num_rows = $db->num_rows($resql);
-					if ($num_rows > 0) {
-						while ($obj = $db->fetch_object($resql)) {
+			// Add the link of alternate translation reference
+			if ($listofaltlang) {			// If website has other languages to support
+				if ($objectpage->lang) {	// A language is forced on the page, it means we may have other language files with hard links into properties of page
+					// Add page "translation of"
+					$translationof = $objectpage->fk_page;
+					if ($translationof) {
+						$tmppage = new WebsitePage($db);
+						$tmppage->fetch($translationof);
+						if ($tmppage->id > 0) {
 							$tmpshortlangcode = '';
-							if ($obj->lang) {
-								$tmpshortlangcode = preg_replace('/[_-].*$/', '', $obj->lang); // en_US or en-US -> en
+							if ($tmppage->lang) {
+								$tmpshortlangcode = preg_replace('/[_-].*$/', '', $tmppage->lang); // en_US or en-US -> en
+							}
+							if (empty($tmpshortlangcode)) {
+								$tmpshortlangcode = preg_replace('/[_-].*$/', '', $object->lang); // en_US or en-US -> en
 							}
 							if ($tmpshortlangcode != $shortlangcode) {
-								$tplcontent .= '<link rel="alternate" hreflang="'.$tmpshortlangcode.'" href="<?php echo $website->virtualhost; ?>'.($object->fk_default_home == $obj->id ? '/' : (($tmpshortlangcode != substr($object->lang, 0, 2) ? '/'.$tmpshortlangcode : '')).'/'.$obj->pageurl.'.php').'" />'."\n";
+								$tplcontent .= '<link rel="alternate" hreflang="'.$tmpshortlangcode.'" href="<?php echo $website->virtualhost; ?>'.($object->fk_default_home == $tmppage->id ? '/' : (($tmpshortlangcode != substr($object->lang, 0, 2)) ? '/'.$tmpshortlangcode : '').'/'.$tmppage->pageurl.'.php').'" />'."\n";
 							}
 						}
 					}
+
+					// Add "has translation pages"
+					$sql = "SELECT rowid as id, lang, pageurl from ".MAIN_DB_PREFIX.'website_page where fk_page IN ('.$db->sanitize($objectpage->id.($translationof ? ", ".$translationof : '')).")";
+					$resql = $db->query($sql);
+					if ($resql) {
+						$num_rows = $db->num_rows($resql);
+						if ($num_rows > 0) {
+							while ($obj = $db->fetch_object($resql)) {
+								$tmpshortlangcode = '';
+								if ($obj->lang) {
+									$tmpshortlangcode = preg_replace('/[_-].*$/', '', $obj->lang); // en_US or en-US -> en
+								}
+								if ($tmpshortlangcode != $shortlangcode) {
+									$tplcontent .= '<link rel="alternate" hreflang="'.$tmpshortlangcode.'" href="<?php echo $website->virtualhost; ?>'.($object->fk_default_home == $obj->id ? '/' : (($tmpshortlangcode != substr($object->lang, 0, 2) ? '/'.$tmpshortlangcode : '')).'/'.$obj->pageurl.'.php').'" />'."\n";
+								}
+							}
+						}
+					} else {
+						dol_print_error($db);
+					}
+
+					// Add myself
+					$tplcontent .= '<?php if ($_SERVER["PHP_SELF"] == "'.(($object->fk_default_home == $objectpage->id) ? '/' : (($shortlangcode != substr($object->lang, 0, 2)) ? '/'.$shortlangcode : '')).'/'.$objectpage->pageurl.'.php") { ?>'."\n";
+					$tplcontent .= '<link rel="alternate" hreflang="'.$shortlangcode.'" href="<?php echo $website->virtualhost; ?>'.(($object->fk_default_home == $objectpage->id) ? '/' : (($shortlangcode != substr($object->lang, 0, 2)) ? '/'.$shortlangcode : '').'/'.$objectpage->pageurl.'.php').'" />'."\n";
+
+					$tplcontent .= '<?php } ?>'."\n";
 				} else {
-					dol_print_error($db);
+					$canonicalurl = '/'.$objectpage->pageurl.'.php';
+					$arrayofaltlang = explode(',', $listofaltlang);
+					foreach ($arrayofaltlang as $altlang) {
+						// Add parameter ID required to be unique/canonical
+						$canonicalurladdidlang = '<?php echo GETPOSTINT("id") ? "?id=".GETPOSTINT("id")."&" : "?" ?>';
+						$canonicalurladdidlang .= 'l='.$altlang;
+						$tplcontent .= '<link rel="alternate" hreflang="'.$altlang.'" href="<?php echo $website->virtualhost; ?>'.$canonicalurl.$canonicalurladdidlang.'" />'."\n";
+					}
 				}
-
-				// Add myself
-				$tplcontent .= '<?php if ($_SERVER["PHP_SELF"] == "'.(($object->fk_default_home == $objectpage->id) ? '/' : (($shortlangcode != substr($object->lang, 0, 2)) ? '/'.$shortlangcode : '')).'/'.$objectpage->pageurl.'.php") { ?>'."\n";
-				$tplcontent .= '<link rel="alternate" hreflang="'.$shortlangcode.'" href="<?php echo $website->virtualhost; ?>'.(($object->fk_default_home == $objectpage->id) ? '/' : (($shortlangcode != substr($object->lang, 0, 2)) ? '/'.$shortlangcode : '').'/'.$objectpage->pageurl.'.php').'" />'."\n";
-
-				$tplcontent .= '<?php } ?>'."\n";
-			} else {
 			}
 		}
+
 		// Add manifest.json. Do we have to add it only on home page ?
 		$tplcontent .= '<?php if ($website->use_manifest) { print \'<link rel="manifest" href="/manifest.json.php" />\'."\n"; } ?>'."\n";
 		$tplcontent .= '<!-- Include link to CSS file -->'."\n";
