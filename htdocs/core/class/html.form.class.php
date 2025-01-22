@@ -3988,7 +3988,7 @@ class Form
 					$optstart .= ' data-price-id="' . dol_escape_htmltag($objp->idprodfournprice) . '"';
 					$optstart .= ' data-qty="' . dol_escape_htmltag($objp->quantity) . '"';
 					$optstart .= ' data-up="' . dol_escape_htmltag(price2num($objp->unitprice)) . '"';		// the price with numeric international format
-					$optstart .= ' data-up-locale="' . dol_escape_htmltag(price($objp->unitprice)) . '"';	// the price formated in user languge
+					$optstart .= ' data-up-locale="' . dol_escape_htmltag(price($objp->unitprice)) . '"';	// the price formatted in user language
 					$optstart .= ' data-discount="' . dol_escape_htmltag($outdiscount) . '"';
 					$optstart .= ' data-tvatx="' . dol_escape_htmltag(price2num($objp->tva_tx)) . '"';		// the rate with numeric international format
 					$optstart .= ' data-tvatx-formated="' . dol_escape_htmltag(price($objp->tva_tx, 0, $langs, 1, -1, 2)) . '"';	// the rate formatted in user language
