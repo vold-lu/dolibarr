@@ -315,14 +315,14 @@ function dolSavePageContent($filetpl, Website $object, WebsitePage $objectpage, 
 			$tplcontent .= '$tmp = preg_replace("/<meta name=\"description\" content=\".*?\" \/>/s", "<meta name=\"description\" content=\"" . dol_string_nohtmltag($__PAGE__DESC__) . "\"  />", $tmp);';
 		}
 		// New method for custom SEO
-		if (strpos($objectpage->content, 'define("__SEO_PAGE_TITLE__")') !== false) {
+		if (strpos($objectpage->content, 'define("__SEO_PAGE_TITLE__"') !== false) {
 			$tplcontent .= '$tmp = preg_replace("/<title>.*?<\/title>/s", "<title>" . dol_escape_htmltag(constant("__SEO_PAGE_TITLE__")) . "</title>", $tmp);'."\n";
 			$tplcontent .= '$tmp = preg_replace("/<meta name=\"title\" content=\".*?\" \/>/s", "<meta name=\"title\" content=\"" . dol_string_nohtmltag(constant("__SEO_PAGE_TITLE__")) . "\"  />", $tmp);';
 		}
-		if (strpos($objectpage->content, 'define("__SEO_PAGE_KEYWORDS__")') !== false) {
+		if (strpos($objectpage->content, 'define("__SEO_PAGE_KEYWORDS__"') !== false) {
 			$tplcontent .= '$tmp = preg_replace("/<meta name=\"keywords\" content=\".*?\" \/>/s", "<meta name=\"keywords\" content=\"" . dol_string_nohtmltag(constant("__SEO_PAGE_KEYWORDS__")) . "\"  />", $tmp);';
 		}
-		if (strpos($objectpage->content, 'define("__SEO_PAGE_DESC__")') !== false) {
+		if (strpos($objectpage->content, 'define("__SEO_PAGE_DESC__"') !== false) {
 			$tplcontent .= '$tmp = preg_replace("/<meta name=\"description\" content=\".*?\" \/>/s", "<meta name=\"description\" content=\"" . dol_string_nohtmltag(constant("__SEO_PAGE_DESC__")) . "\"  />", $tmp);';
 		}
 
