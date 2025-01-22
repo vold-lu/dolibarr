@@ -281,11 +281,16 @@ function dolSavePageContent($filetpl, Website $object, WebsitePage $objectpage, 
 				} else {
 					$canonicalurl = '/'.$objectpage->pageurl.'.php';
 					$arrayofaltlang = explode(',', $listofaltlang);
+
+					$tmpshortlangcode = preg_replace('/[_-].*$/', '', $object->lang); // en_US or en-US -> en
+
 					foreach ($arrayofaltlang as $altlang) {
-						// Add parameter ID required to be unique/canonical
-						$canonicalurladdidlang = '<?php echo GETPOSTINT("id") ? "?id=".GETPOSTINT("id")."&" : "?" ?>';
-						$canonicalurladdidlang .= 'l='.$altlang;
-						$tplcontent .= '<link rel="alternate" hreflang="'.$altlang.'" href="<?php echo $website->virtualhost; ?>'.$canonicalurl.$canonicalurladdidlang.'" />'."\n";
+						if ($altlang != $tmpshortlangcode) {
+							// Add parameter ID required to be unique/canonical
+							$canonicalurladdidlang = '<?php echo GETPOSTINT("id") ? "?id=".GETPOSTINT("id")."&" : "?" ?>';
+							$canonicalurladdidlang .= 'l='.$altlang;
+							$tplcontent .= '<link rel="alternate" hreflang="'.$altlang.'" href="<?php echo $website->virtualhost; ?>'.$canonicalurl.$canonicalurladdidlang.'" />'."\n";
+						}
 					}
 				}
 			}
