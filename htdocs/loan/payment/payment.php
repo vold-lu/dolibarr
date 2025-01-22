@@ -62,7 +62,7 @@ if (!$user->hasRight('loan', 'write')) {
 $loan = new Loan($db);
 $loan->fetch($chid);
 
-//$line_id = 0; // TODO $line_id is never defined !!
+$line_id = 0;
 $echance = 0;
 $amount_capital = 0;
 $amount_insurance = 0;
@@ -75,8 +75,8 @@ if ($res > 0) {
 	foreach ($ls->lines as $l) {
 		$echance++; // Count term pos
 		// last unpaid term
-		if (empty($l->fk_bank)) { // TODO fk_bank is never empty !
-			$line_id = $l->id; // TODO $line_id is never defined (fk_bank is never empty)
+		if (empty($l->fk_bank)) {
+			$line_id = $l->id;
 			break;
 		} elseif ($line_id == $l->id) {
 			// If line_id provided, only count temp pos
@@ -86,7 +86,7 @@ if ($res > 0) {
 }
 
 // Set current line with last unpaid line (only if schedule is used)
-if (!empty($line_id)) {  // TODO $line_id is never defined and already empty !
+if (!empty($line_id)) {
 	$line = new LoanSchedule($db);
 	$res = $line->fetch($line_id);
 	if ($res > 0) {
