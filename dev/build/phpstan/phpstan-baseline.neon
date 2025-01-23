@@ -22333,30 +22333,6 @@ parameters:
 			path: ../../../htdocs/loan/payment/payment.php
 
 		-
-			message: '#^Variable \$amount_capital might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../../htdocs/loan/payment/payment.php
-
-		-
-			message: '#^Variable \$amount_insurance might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../../htdocs/loan/payment/payment.php
-
-		-
-			message: '#^Variable \$amount_interest might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../../htdocs/loan/payment/payment.php
-
-		-
-			message: '#^Variable \$line_id might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../../htdocs/loan/payment/payment.php
-
-		-
 			message: '#^Variable \$sumpaid might not be defined\.$#'
 			identifier: variable.undefined
 			count: 4
