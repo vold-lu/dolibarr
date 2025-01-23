@@ -343,7 +343,7 @@ if (!empty($doactionsthenredirect)) {
 	// Redirect to an error page
 	// Paymentko page must be created for the specific website
 	if (!defined('USEDOLIBARRSERVER') && !empty($ws_virtuelhost)) {
-		$ext_urlok = $ws_virtuelhost . '/paymentko.php?fulltag='.$FULLTAG;
+		$ext_urlko = $ws_virtuelhost . '/paymentko.php?fulltag='.$FULLTAG;
 	} else {
 		$ext_urlko = DOL_URL_ROOT.'/public/website/index.php?website='.urlencode($ws).'&pageref=paymentko&fulltag='.$FULLTAG;
 	}
