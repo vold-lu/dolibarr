@@ -3,8 +3,8 @@
  * Copyright (C) 2017		Olivier Geffroy			<jeff@jeffinfo.com>
  * Copyright (C) 2017		Saasprov				<saasprov@gmail.com>
  * Copyright (C) 2018-2022  Thibault FOUCART		<support@ptibogxiv.net>
- * Copyright (C) 2018-2024  Frédéric France         <frederic.france@free.fr>
- * Copyright (C) 2024		MDW							<mdeweerd@users.noreply.github.com>
+ * Copyright (C) 2018-2025  Frédéric France         <frederic.france@free.fr>
+ * Copyright (C) 2024		MDW						<mdeweerd@users.noreply.github.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -386,7 +386,9 @@ $form->select_comptes(getDolGlobalString('STRIPE_BANK_ACCOUNT_FOR_PAYMENTS'), 'S
 print '</td></tr>';
 
 
-// Param to record automatically payouts (received from IPN payout.payed and payout.created)
+// Param to record automatically payouts (received from IPN payout.paid and payout.created)
+// https://docs.stripe.com/api/events/types#event_types-payout.created
+// https://docs.stripe.com/api/events/types#event_types-payout.paid
 print '<tr class="oddeven"><td>';
 print $langs->trans("StripeAutoRecordPayout").'</td><td>';
 if ($conf->use_javascript_ajax) {
