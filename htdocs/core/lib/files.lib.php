@@ -2153,6 +2153,8 @@ function addFileIntoDatabaseIndex($dir, $file, $fullpathorig = '', $mode = 'uplo
 	$result = 0;
 	$error = 0;
 
+	dol_syslog("addFileIntoDatabaseIndex dir=".$dir." file=".$file, LOG_DEBUG);
+
 	$rel_dir = preg_replace('/^'.preg_quote(DOL_DATA_ROOT, '/').'/', '', $dir);
 
 	if (!preg_match('/[\\/]temp[\\/]|[\\/]thumbs|\.meta$/', $rel_dir)) {     // If not a temporary directory. TODO Does this test work ?
