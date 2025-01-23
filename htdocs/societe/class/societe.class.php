@@ -5712,6 +5712,16 @@ class Societe extends CommonObject
 			}
 
 			if (!$error) {
+				// We finally remove the old thirdparty
+				if ($soc_origin->delete($soc_origin->id, $user) < 1) {
+					$this->error = $soc_origin->error;
+					$this->errors = $soc_origin->errors;
+					$error++;
+				}
+			}
+
+
+			if (!$error) {
 				// Move files from the dir of the third party to delete into the dir of the third party to keep
 				if (!empty($conf->societe->multidir_output[$this->entity])) {
 					$srcdir = $conf->societe->multidir_output[$this->entity]."/".$soc_origin->id;
@@ -5726,16 +5736,6 @@ class Societe extends CommonObject
 						}
 						//exit;
 					}
-				}
-			}
-
-
-			if (!$error) {
-				// We finally remove the old thirdparty
-				if ($soc_origin->delete($soc_origin->id, $user) < 1) {
-					$this->error = $soc_origin->error;
-					$this->errors = $soc_origin->errors;
-					$error++;
 				}
 			}
 
