@@ -579,7 +579,7 @@ if ($id > 0 || !empty($ref)) {
 		$param .= '&search_progressdeclare='.urlencode($search_progressdeclare);
 	}
 	if ($search_status) {
-		$param .= '&search_status='.urlencode((string)$search_status);
+		$param .= '&search_status='.urlencode((string) ($search_status));
 	}
 	if ($search_task_budget_amount) {
 		$param .= '&search_task_budget_amount='.urlencode($search_task_budget_amount);

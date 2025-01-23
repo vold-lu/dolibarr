@@ -782,7 +782,6 @@ if ($id > 0 || !empty($ref)) {
 				}
 			} else {
 				print '<a class="butActionRefused classfortooltip" href="#" title="'.$langs->trans("NotAllowed").'">'.$langs->trans('Modify').'</a>';
-
 			}
 
 			// Delete
