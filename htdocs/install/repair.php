@@ -1313,23 +1313,27 @@ if ($ok && GETPOST('clean_ecm_files_table', 'alpha')) {
 		$num = $db->num_rows($resql);
 		if ($num) {
 			$i = 0;
-			while ($i < $num && $nbfiletodelete < $MAXTODELETE) {
+			while ($i < $num) {
 				$obj = $db->fetch_object($resql);
 				if ($obj->rowid > 0) {
 					$filetocheck = DOL_DATA_ROOT.'/'.$obj->filepath.'/'.$obj->filename;
 					$nbfile++;
 					if (!dol_is_file($filetocheck)) {
 						$nbfiletodelete++;
-						print '<tr><td>Found line with id '.$obj->rowid.', entity '.$obj->entity.', file "'.$filetocheck.'" to delete';
-						if (GETPOST('clean_ecm_files_table', 'alpha') == 'confirmed') {
-							$sqldelete = "DELETE FROM ".MAIN_DB_PREFIX."ecm_files WHERE rowid = ".((int) $obj->rowid);
-							$resqldelete = $db->query($sqldelete);
-							if (!$resqldelete) {
-								dol_print_error($db);
+						if ($nbfiletodelete <= $MAXTODELETE) {
+							print '<tr><td>Found line with id '.$obj->rowid.', entity '.$obj->entity.', file "'.$filetocheck.'" to delete';
+							if (GETPOST('clean_ecm_files_table', 'alpha') == 'confirmed') {
+								$sqldelete = "DELETE FROM ".MAIN_DB_PREFIX."ecm_files WHERE rowid = ".((int) $obj->rowid);
+								$resqldelete = $db->query($sqldelete);
+								if (!$resqldelete) {
+									dol_print_error($db);
+								}
+								print ' - deleted';
 							}
-							print ' - deleted';
+							print '</td></tr>';
+						} else {
+							break;
 						}
-						print '</td></tr>';
 					}
 				}
 				$i++;
