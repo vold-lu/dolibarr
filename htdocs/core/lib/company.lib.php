@@ -1756,7 +1756,6 @@ function show_actions_done($conf, $langs, $db, $filterobj, $objcon = null, $nopr
 	global $user, $conf, $hookmanager;
 	global $form;
 	global $param, $massactionbutton;
-	global $langs;
 
 	$start_year = GETPOSTINT('dateevent_startyear');
 	$start_month = GETPOSTINT('dateevent_startmonth');
