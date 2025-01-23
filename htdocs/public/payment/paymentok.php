@@ -169,7 +169,6 @@ $ErrorCode = $ErrorShortMsg = $ErrorLongMsg = $ErrorSeverityCode = '';
 
 
 $object = new stdClass(); // For triggers
-/** @var CommonObject $object */
 
 $error = 0;
 
