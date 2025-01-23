@@ -1501,7 +1501,7 @@ while ($i < $imaxinloop) {
 					$totalarray['totalprogress_summary'] = $totalarray['nbfield'];
 				}
 			}
-			// Project status
+			// Task status
 			if (!empty($arrayfields['t.fk_statut']['checked'])) {
 				print '<td class="center">';
 				print $object->getLibStatut(4);
