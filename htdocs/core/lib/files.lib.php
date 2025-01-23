@@ -1920,8 +1920,10 @@ function dol_add_file_process($upload_dir, $allowoverwrite = 0, $updatesessionor
 			setEventMessages($langs->trans("ErrorTooMuchFileInForm", $maxfilesinform), null, "errors");
 			return -1;
 		}
+
 		$result = dol_mkdir($upload_dir);
-		//      var_dump($result);exit;
+		//var_dump($result);exit;
+
 		if ($result >= 0) {
 			$TFile = $_FILES[$varfiles];
 			// Convert value of $TFile
@@ -2019,6 +2021,12 @@ function dol_add_file_process($upload_dir, $allowoverwrite = 0, $updatesessionor
 						if ($TFile['type'][$i] == 'application/pdf' && strpos($_SERVER["REQUEST_URI"], 'product') !== false && getDolGlobalString('PRODUCT_ALLOW_EXTERNAL_DOWNLOAD')) {
 							$sharefile = 1;
 						}
+
+						// If we allow overwrite, we may need to also overwrite index, so we delete index first so insert can work
+						if ($allowoverwrite) {
+							deleteFilesIntoDatabaseIndex($upload_dir, basename($destfile).($resupload == 2 ? '.noexe' : ''), '');
+						}
+
 						$result = addFileIntoDatabaseIndex($upload_dir, basename($destfile).($resupload == 2 ? '.noexe' : ''), $TFile['name'][$i], 'uploaded', $sharefile, $object);
 						if ($result < 0) {
 							if ($allowoverwrite) {
@@ -2304,7 +2312,7 @@ function addFileIntoDatabaseIndex($dir, $file, $fullpathorig = '', $mode = 'uplo
  */
 function deleteFilesIntoDatabaseIndex($dir, $file, $mode = 'uploaded')
 {
-	global $conf, $db, $user;
+	global $conf, $db;
 
 	$error = 0;
 
@@ -2313,29 +2321,33 @@ function deleteFilesIntoDatabaseIndex($dir, $file, $mode = 'uploaded')
 		return -1;
 	}
 
+	dol_syslog("deleteFilesIntoDatabaseIndex dir=".$dir." file=".$file, LOG_DEBUG);
+
 	$db->begin();
 
 	$rel_dir = preg_replace('/^'.preg_quote(DOL_DATA_ROOT, '/').'/', '', $dir);
 
-	$filename = basename($file);
-	$rel_dir = preg_replace('/[\\/]$/', '', $rel_dir);
-	$rel_dir = preg_replace('/^[\\/]/', '', $rel_dir);
+	if (!preg_match('/[\\/]temp[\\/]|[\\/]thumbs|\.meta$/', $rel_dir)) {     // If not a temporary directory. TODO Does this test work ?
+		$filename = basename($file);
+		$rel_dir = preg_replace('/[\\/]$/', '', $rel_dir);
+		$rel_dir = preg_replace('/^[\\/]/', '', $rel_dir);
 
-	if (!$error) {
-		$sql = 'DELETE FROM '.MAIN_DB_PREFIX.'ecm_files';
-		$sql .= ' WHERE entity = '.$conf->entity;
-		$sql .= " AND filepath = '".$db->escape($rel_dir)."'";
-		if ($file) {
-			$sql .= " AND filename = '".$db->escape($file)."'";
-		}
-		if ($mode) {
-			$sql .= " AND gen_or_uploaded = '".$db->escape($mode)."'";
-		}
+		if (!$error) {
+			$sql = 'DELETE FROM '.MAIN_DB_PREFIX.'ecm_files';
+			$sql .= ' WHERE entity = '.((int) $conf->entity);
+			$sql .= " AND filepath = '".$db->escape($rel_dir)."'";
+			if ($file) {
+				$sql .= " AND filename = '".$db->escape($file)."'";
+			}
+			if ($mode) {
+				$sql .= " AND gen_or_uploaded = '".$db->escape($mode)."'";
+			}
 
-		$resql = $db->query($sql);
-		if (!$resql) {
-			$error++;
-			dol_syslog(__FUNCTION__.' '.$db->lasterror(), LOG_ERR);
+			$resql = $db->query($sql);
+			if (!$resql) {
+				$error++;
+				dol_syslog(__FUNCTION__.' '.$db->lasterror(), LOG_ERR);
+			}
 		}
 	}
 
