@@ -2342,6 +2342,7 @@ function show_actions_done($conf, $langs, $db, $filterobj, $objcon = null, $nopr
 				if (!empty($arraylist[$labelOfTypeToShow])) {
 					$labelOfTypeToShow = $arraylist[$labelOfTypeToShow];
 				} elseif ($actionstatic->type_code == 'AC_EMAILING') {
+					$langs->load("mails");
 					$labelOfTypeToShow = $langs->trans("Emailing");
 				}
 				if ($actionstatic->type_code == 'AC_OTH_AUTO' && ($actionstatic->type_code != $actionstatic->code) && $labelOfTypeToShow && !empty($arraylist[$actionstatic->code])) {
