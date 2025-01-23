@@ -1318,7 +1318,7 @@ if ($ok && GETPOST('clean_ecm_files_table', 'alpha')) {
 				if ($obj->rowid > 0) {
 					$filetocheck = DOL_DATA_ROOT.'/'.$obj->filepath.'/'.$obj->filename;
 					$nbfile++;
-					if (!dol_is_file($filetocheck)) {
+					if (!dol_is_file($filetocheck) && !dol_is_file($filetocheck.'.noexe')) {
 						$nbfiletodelete++;
 						if ($nbfiletodelete <= $MAXTODELETE) {
 							print '<tr><td>Found line with id '.$obj->rowid.', entity '.$obj->entity.', file "'.$filetocheck.'" to delete';
