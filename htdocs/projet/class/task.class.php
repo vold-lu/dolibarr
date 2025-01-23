@@ -786,60 +786,6 @@ class Task extends CommonObjectLine
 		}
 	}
 
-
-	/**
-	 *  Close task from database
-	 * @param User $user User that close
-	 * @param int $notrigger 0=launch triggers after, 1=disable triggers
-	 * @return    int                        Return integer <0 if KO, >0 if OK
-	 */
-	public function close($user,$notrigger = 0) {
-
-		global $conf;
-		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-
-		$error = 0;
-
-		$this->db->begin();
-
-		dol_syslog(get_class($this)."::close record task", LOG_DEBUG);
-
-		$sql = " UPDATE ".MAIN_DB_PREFIX."projet_task ";
-		$sql.= "SET fk_statut=".$this::STATUS_CLOSED." WHERE rowid=".(int) $this->id;
-
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			$error++;
-			$this->errors[] = "Error ".$this->db->lasterror();
-		}
-
-		if (!$error) {
-			if (!$notrigger) {
-				// Call trigger
-				$result = $this->call_trigger('TASK_CLOSE', $user);
-				if ($result < 0) {
-					$error++;
-				}
-				// End call triggers
-			}
-		}
-
-		// Commit or rollback
-		if ($error) {
-			foreach ($this->errors as $errmsg) {
-				dol_syslog(get_class($this)."::delete ".$errmsg, LOG_ERR);
-				$this->error .= ($this->error ? ', '.$errmsg : $errmsg);
-			}
-			$this->db->rollback();
-			return -1 * $error;
-		} else {
-			$this->db->commit();
-			return 1;
-		}
-
-	}
-
-
 	/**
 	 *	Delete task from database
 	 *

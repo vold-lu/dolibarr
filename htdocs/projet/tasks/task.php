@@ -217,7 +217,7 @@ if ($action == 'confirm_close' && $confirm == "yes" && $user->hasRight('projet',
 	$result = $projectstatic->fetch($object->fk_project);
 	$projectstatic->fetch_thirdparty();
 
-	if ($object->close($user) > 0) {
+	if ($object->setStatusCommon($user, Task::STATUS_CLOSED) > 0) {
 		header('Location: '.DOL_URL_ROOT.'/projet/tasks.php?restore_lastsearch_values=1&id='.$projectstatic->id.($withproject ? '&withproject=1' : ''));
 		exit;
 	} else {
@@ -270,6 +270,17 @@ if ($action == 'remove_file' && $user->hasRight('projet', 'creer')) {
 		setEventMessages($langs->trans("FileWasRemoved", GETPOST('urlfile')), null, 'mesgs');
 	} else {
 		setEventMessages($langs->trans("ErrorFailToDeleteFile", GETPOST('urlfile')), null, 'errors');
+	}
+}
+
+// Reopen task
+if ($action == 'reopen' && $user->hasRight('projet', 'creer')) {
+	$result = $object->setStatusCommon($user, Task::STATUS_VALIDATED);
+	if ($result >= 0) {
+		setEventMessages($langs->trans("TaskReopened"), null, 'mesgs');
+	} else {
+		$error++;
+		setEventMessages($object->error, $object->errors, 'errors');
 	}
 }
 
@@ -757,13 +768,18 @@ if ($id > 0 || !empty($ref)) {
 		if (empty($reshook)) {
 			// Modify
 			if ($user->hasRight('projet', 'creer')) {
-				if ($object->fk_statut != $object::STATUS_CLOSED)
+				if ($object->status != $object::STATUS_CLOSED) {
 					print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=edit&token='.newToken().'&withproject='.((int) $withproject).'">'.$langs->trans('Modify').'</a>';
+				}
 				print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=clone&token='.newToken().'&withproject='.((int) $withproject).'">'.$langs->trans('Clone').'</a>';
 				print '<a class="butActionDelete classfortooltip" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=merge&token='.newToken().'&withproject='.((int) $withproject).'" title="'.$langs->trans("MergeTasks").'">'.$langs->trans('Merge').'</a>';
 
-				if ($object->fk_statut != $object::STATUS_CLOSED)
-				print '<a class="butAction classfortooltip" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=close&token='.newToken().'&withproject='.((int) $withproject).'" title="'.$langs->trans("Close").'">'.$langs->trans('Close').'</a>';
+				if ($object->status != $object::STATUS_CLOSED) {
+					print '<a class="butAction classfortooltip" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=close&token='.newToken().'&withproject='.((int) $withproject).'" title="'.$langs->trans("Close").'">'.$langs->trans('Close').'</a>';
+				}
+				if ($object->status == $object::STATUS_CLOSED) {
+					print '<a class="butAction classfortooltip" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=reopen&token='.newToken().'&withproject='.((int) $withproject).'" title="'.$langs->trans("ReOpen").'">'.$langs->trans('ReOpen').'</a>';
+				}
 			} else {
 				print '<a class="butActionRefused classfortooltip" href="#" title="'.$langs->trans("NotAllowed").'">'.$langs->trans('Modify').'</a>';
 

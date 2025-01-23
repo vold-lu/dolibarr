@@ -315,3 +315,4 @@ Billable = Billable
 ConfirmCloseTask=Are you sure you want to close this task ?
 ConfirmClosed=Confirm task closed
 TaskStatus=Task status
+TaskReopened=Task reopened
