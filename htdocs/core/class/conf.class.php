@@ -4,7 +4,7 @@
  * Copyright (C) 2004-2020  Laurent Destailleur     <eldy@users.sourceforge.net>
  * Copyright (C) 2005-2017  Regis Houssin           <regis.houssin@inodbox.com>
  * Copyright (C) 2006 	    Jean Heimburger         <jean@tiaris.info>
- * Copyright (C) 2024       Frédéric France         <frederic.france@free.fr>
+ * Copyright (C) 2024-2025  Frédéric France         <frederic.france@free.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1204,10 +1204,10 @@ class Conf extends stdClass
 
 			// For modules that want to disable top or left menu
 			if (!empty($this->global->MAIN_HIDE_TOP_MENU)) {
-				$this->dol_hide_topmenu = getDolGlobalString('MAIN_HIDE_TOP_MENU');
+				$this->dol_hide_topmenu = getDolGlobalInt('MAIN_HIDE_TOP_MENU');
 			}
 			if (!empty($this->global->MAIN_HIDE_LEFT_MENU)) {
-				$this->dol_hide_leftmenu = getDolGlobalString('MAIN_HIDE_LEFT_MENU');
+				$this->dol_hide_leftmenu = getDolGlobalInt('MAIN_HIDE_LEFT_MENU');
 			}
 
 			if (empty($this->global->MAIN_SIZE_SHORTLIST_LIMIT)) {

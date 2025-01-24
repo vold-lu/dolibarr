@@ -386,7 +386,7 @@ $form->select_comptes(getDolGlobalString('STRIPE_BANK_ACCOUNT_FOR_PAYMENTS'), 'S
 print '</td></tr>';
 
 
-// Param to record automatically payouts (received from IPN payout.payed and payout.created)
+// Param to record automatically payouts (received from IPN payout.paid and payout.created)
 print '<tr class="oddeven"><td>';
 print $langs->trans("StripeAutoRecordPayout").'</td><td>';
 if ($conf->use_javascript_ajax) {
