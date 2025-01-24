@@ -203,7 +203,7 @@ if ($action == 'add_payment' && $permissiontoadd) {
 							$ls->lines[$k - 1]->fk_bank = $payment->fk_bank;
 							$ls->lines[$k - 1]->fk_payment_loan = $payment->id;
 						}
-						$ls->lines[$k - 1]->amount_capital = $v['mens'] - $v['interet'];
+						$ls->lines[$k - 1]->amount_capital = ((float) price2num($v['mens'])) - $v['interet'];
 						$ls->lines[$k - 1]->amount_interest = $v['interet'];
 						$ls->lines[$k - 1]->tms = dol_now();
 						$ls->lines[$k - 1]->fk_user_modif = $user->id;
