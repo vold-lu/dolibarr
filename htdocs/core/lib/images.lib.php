@@ -513,7 +513,7 @@ function correctExifImageOrientation($fileSource, $fileDest, $quality = 95)
  *    	@param     int		$maxWidth       	Maximum width of the thumbnail (-1=unchanged, 160 by default)
  *    	@param     int		$maxHeight      	Maximum height of the thumbnail (-1=unchanged, 120 by default)
  *    	@param     string	$extName        	Extension to differentiate thumb file name ('_small', '_mini')
- *    	@param     int		$quality        	Quality of compression (0=worst, 100=best)
+ *    	@param     int		$quality        	Quality after compression (0=worst so better compression, 100=best so low or no compression)
  *      @param     string	$outdir           	Directory where to store thumb
  *      @param     int		$targetformat     	New format of target (IMAGETYPE_GIF, IMAGETYPE_JPG, IMAGETYPE_PNG, IMAGETYPE_BMP, IMAGETYPE_WBMP ... or 0 to keep original format)
  *    	@return    string|int<0,0>				Full path of thumb or '' if it fails or 'Error...' if it fails, or 0 if it fails to detect the type of image
@@ -527,18 +527,14 @@ function vignette($file, $maxWidth = 160, $maxHeight = 120, $extName = '_small',
 	dol_syslog("vignette file=".$file." extName=".$extName." maxWidth=".$maxWidth." maxHeight=".$maxHeight." quality=".$quality." outdir=".$outdir." targetformat=".$targetformat);
 
 	// Clean parameters
-	$file = trim($file);
+	$file = dol_sanitizePathName(trim($file));
 
 	// Check parameters
 	if (!$file) {
 		// If the file has not been indicated
 		return 'ErrorBadParameters';
-	} elseif (!file_exists($file)) {
-		// If the file passed in parameter does not exist
-		dol_syslog($langs->trans("ErrorFileNotFound", $file), LOG_ERR);
-		return $langs->trans("ErrorFileNotFound", $file);
 	} elseif (image_format_supported($file) < 0) {
-		dol_syslog('This file '.$file.' does not seem to be an image format file name.', LOG_WARNING);
+		dol_syslog('This file '.$file.' does not seem to be a supported image file name (bad extension).', LOG_WARNING);
 		return 'ErrorBadImageFormat';
 	} elseif (!is_numeric($maxWidth) || empty($maxWidth) || $maxWidth < -1) {
 		// If max width is incorrect (not numeric, empty, or less than 0)
@@ -550,7 +546,13 @@ function vignette($file, $maxWidth = 160, $maxHeight = 120, $extName = '_small',
 		return 'Error: Wrong value for parameter maxHeight';
 	}
 
-	$filetoread = realpath(dol_osencode($file)); // Chemin canonique absolu de l'image
+	$filetoread = realpath(dol_osencode($file)); // Absolute canonical path of image
+
+	if (!file_exists($filetoread)) {
+		// If the file passed in parameter does not exist
+		dol_syslog($langs->trans("ErrorFileNotFound", $filetoread), LOG_ERR);
+		return $langs->trans("ErrorFileNotFound", $filetoread);
+	}
 
 	$infoImg = getimagesize($filetoread); // Get information like size and real format of image. Warning real format may be png when extension is .jpg
 	$imgWidth = $infoImg[0]; 	// Width of image
@@ -759,7 +761,6 @@ function vignette($file, $maxWidth = 160, $maxHeight = 120, $extName = '_small',
 			imagealphablending($imgThumb, false); // For compatibility on certain systems
 			$trans_colour = imagecolorallocatealpha($imgThumb, 255, 255, 255, 127); // Keep transparent channel
 			$extImgTarget = '.png';
-			$newquality = $quality - 100;
 			$newquality = round(abs($quality - 100) * 9 / 100);
 			break;
 		case IMAGETYPE_BMP:	    // 6

@@ -1876,6 +1876,33 @@ function dol_string_nounprintableascii($str, $removetabcrlf = 1)
 }
 
 /**
+ *  Returns text slugified (no special char, separator is "-".
+ *
+ *  @param	string	$stringtoslugify		String to slugify
+ *  @return string							Slugified string
+ */
+function dolSlugify($stringtoslugify)
+{
+	$slug = dol_string_unaccent($stringtoslugify);
+
+	// Convert special characters to their ASCII equivalents
+	if (function_exists('iconv')) {
+		$slug = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $slug);
+	}
+
+	// Convert to lowercase
+	$slug = strtolower($slug);
+
+	// Replace non-alphanumeric characters with hyphens
+	$slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
+
+	// Remove leading and trailing hyphens
+	$slug = trim($slug, '-');
+
+	return $slug;
+}
+
+/**
  *  Returns text escaped for inclusion into javascript code
  *
  *  @param	string	$stringtoescape			String to escape
@@ -2704,23 +2731,6 @@ function dol_get_fiche_head($links = array(), $active = '', $title = '', $notab 
 	if ($morehtmlright) {
 		$out .= '<div class="inline-block floatright tabsElem">'.$morehtmlright.'</div>'; // Output right area first so when space is missing, text is in front of tabs and not under.
 	}
-
-	// Show title
-	/*
-	if (!empty($title) && $showtitle && !getDolGlobalString('MAIN_OPTIMIZEFORTEXTBROWSER')) {
-		$limittitle = 30;
-		$out .= '<a class="tabTitle">';
-		if ($picto) {
-			$noprefix = $pictoisfullpath;
-			if (strpos($picto, 'fontawesome_') !== false) {
-				$noprefix = 1;
-			}
-			$out .= img_picto($title, ($noprefix ? '' : 'object_').$picto, '', $pictoisfullpath, 0, 0, '', 'imgTabTitle').' ';
-		}
-		$out .= '<span class="tabTitleText">'.dol_escape_htmltag(dol_trunc($title, $limittitle)).'</span>';
-		$out .= '</a>';
-	}
-	*/
 
 	// Show tabs
 
