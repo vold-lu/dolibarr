@@ -20,7 +20,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 /**
  *	\file       	htdocs/core/class/conf.class.php
  *	\ingroup		core
@@ -1036,6 +1035,14 @@ class Conf extends stdClass
 			}
 			if (!isset($this->global->MAIN_MAX_DECIMALS_SHOWN)) {
 				$this->global->MAIN_MAX_DECIMALS_SHOWN = 8;
+			}
+
+			// Non working days
+			if (!isset($this->global->MAIN_NON_WORKING_DAYS_INCLUDE_SATURDAY)) {
+				$this->global->MAIN_NON_WORKING_DAYS_INCLUDE_SATURDAY = 1;
+			}
+			if (!isset($this->global->MAIN_NON_WORKING_DAYS_INCLUDE_SUNDAY)) {
+				$this->global->MAIN_NON_WORKING_DAYS_INCLUDE_SUNDAY = 1;
 			}
 
 			// Default pdf option
