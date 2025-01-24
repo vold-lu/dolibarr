@@ -4,6 +4,7 @@
  * 				 2016       Christophe Battarel <christophe@altairis.fr>
  * Copyright (C) 2023		Benjamin Falière	<benjamin.faliere@altairis.fr>
  * Copyright (C) 2024		MDW							<mdeweerd@users.noreply.github.com>
+ * Copyright (C) 2025       Frédéric France         <frederic.france@free.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -178,6 +179,7 @@ class InterfaceTicketEmail extends DolibarrTriggers
 						if (!getDolGlobalString('TICKET_DISABLE_ALL_MAILS')) {
 							// Send email to assigned user
 							$sendto = $userstat->email;
+							$old_MAIN_MAIL_AUTOCOPY_TO = '';
 							if (!getDolGlobalString('TICKET_DISABLE_MAIL_AUTOCOPY_TO')) {
 								$old_MAIN_MAIL_AUTOCOPY_TO = $conf->global->MAIN_MAIL_AUTOCOPY_TO;
 								$conf->global->MAIN_MAIL_AUTOCOPY_TO = '';
@@ -192,8 +194,7 @@ class InterfaceTicketEmail extends DolibarrTriggers
 							}
 						}
 					} else {
-						$this->error = $userstat->error;
-						$this->errors = $userstat->errors;
+						$this->setErrorsFromObject($userstat);
 					}
 				}
 
