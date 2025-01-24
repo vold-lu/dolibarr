@@ -270,7 +270,7 @@ class Inventory extends CommonObject
 			// Scan existing stock to prefill the inventory
 			$sql = "SELECT ps.rowid, ps.fk_entrepot as fk_warehouse, ps.fk_product, ps.reel,";
 			if (isModEnabled('productbatch')) {
-				$sql .= " pb.batch as batch, pb.qty as qty,";
+				$sql .= " COALESCE(pb.batch, '') as batch, pb.qty as qty,";
 			} else {
 				$sql .= " '' as batch, 0 as qty,";
 			}
@@ -293,7 +293,9 @@ class Inventory extends CommonObject
 				if (!empty($include_sub_warehouse) && getDolGlobalInt('INVENTORY_INCLUDE_SUB_WAREHOUSE')) {
 					$TChildWarehouses = array();
 					$this->getChildWarehouse($this->fk_warehouse, $TChildWarehouses);
-					$sql .= " OR ps.fk_entrepot IN (".$this->db->sanitize(implode(',', $TChildWarehouses)).")";
+					if (!empty($TChildWarehouses)) {
+						$sql .= " OR ps.fk_entrepot IN (" . $this->db->sanitize(implode(',', $TChildWarehouses)) . ")";
+					}
 				}
 				$sql .= ')';
 			}
@@ -600,9 +602,9 @@ class Inventory extends CommonObject
 		if (empty($notooltip)) {
 			if (getDolGlobalString('MAIN_OPTIMIZEFORTEXTBROWSER')) {
 				$label = $langs->trans("ShowInventory");
-				$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
+				$linkclose .= ' alt="'.dolPrintHTMLForAttribute($label).'"';
 			}
-			$linkclose .= ' title="'.dol_escape_htmltag($label, 1).'"';
+			$linkclose .= ' title="'.dolPrintHTMLForAttribute($label).'"';
 			$linkclose .= ' class="classfortooltip'.($morecss ? ' '.$morecss : '').'"';
 		} else {
 			$linkclose = ($morecss ? ' class="'.$morecss.'"' : '');

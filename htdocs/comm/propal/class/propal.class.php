@@ -452,7 +452,9 @@ class Propal extends CommonObject
 		$this->socid = $socid;
 		$this->id = $propalid;
 
-		$this->duree_validite = getDolGlobalInt('PROPALE_VALIDITY_DURATION', 0);
+		$this->duree_validite = getDolGlobalInt('PROPALE_VALIDITY_DURATION');
+
+		$this->fields['ref_ext']['visible'] = getDolGlobalInt('MAIN_LIST_SHOW_REF_EXT');
 	}
 
 
@@ -666,7 +668,7 @@ class Propal extends CommonObject
 			}
 			$txlocaltax1 = price2num($txlocaltax1);
 			$txlocaltax2 = price2num($txlocaltax2);
-			$pa_ht = price2num($pa_ht);
+			$pa_ht = price2num($pa_ht);  // do not convert to float here, it breaks the functioning of $pa_ht_isemptystring
 			if ($price_base_type == 'HT') {
 				$pu = $pu_ht;
 			} else {
@@ -894,7 +896,7 @@ class Propal extends CommonObject
 		}
 		$txlocaltax1 = price2num($txlocaltax1);
 		$txlocaltax2 = price2num($txlocaltax2);
-		$pa_ht = price2num($pa_ht);
+		$pa_ht = price2num($pa_ht);  // do not convert to float here, it breaks the functioning of $pa_ht_isemptystring
 		if (empty($qty) && empty($special_code)) {
 			$special_code = 3; // Set option tag
 		}
@@ -3831,9 +3833,9 @@ class Propal extends CommonObject
 		if (empty($notooltip) && $user->hasRight('propal', 'lire')) {
 			if (getDolGlobalString('MAIN_OPTIMIZEFORTEXTBROWSER')) {
 				$label = $langs->trans("Proposal");
-				$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
+				$linkclose .= ' alt="'.dolPrintHTMLForAttribute($label).'"';
 			}
-			$linkclose .= ($label ? ' title="'.dol_escape_htmltag($label, 1).'"' : ' title="tocomplete"');
+			$linkclose .= ($label ? ' title="'.dolPrintHTMLForAttribute($label).'"' : ' title="tocomplete"');
 			$linkclose .= $dataparams.' class="'.$classfortooltip.'"';
 		}
 
