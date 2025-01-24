@@ -578,8 +578,8 @@ if (!empty($conf->use_javascript_ajax)) {	// If javascript on
 
 	$s .= '<script type="text/javascript">'."\n";
 	$s .= 'jQuery(document).ready(function () {'."\n";
-	$s .= 'jQuery(".check_birthday").click(function() { console.log("Toggle birthdays"); jQuery(".family_birthday").toggle(); });'."\n";
-	$s .= 'jQuery(".check_holiday").click(function() { console.log("Toggle holidays"); jQuery(".family_holiday").toggle(); });'."\n";
+	$s .= 'jQuery(".check_birthday").click(function() { console.log("Toggle class .peruser_birthday"); jQuery(".peruser_birthday").addClass("peruser_birthday_imp"); });'."\n";
+	$s .= 'jQuery(".check_holiday").click(function() { console.log("Toggle class .peruser_holiday"); if (jQuery(".peruser_holiday").hasClass("peruser_holiday_imp")) { jQuery(".peruser_holiday").removeClass("peruser_holiday_imp"); } else { jQuery(".peruser_holiday").addClass("peruser_holiday_imp"); } });'."\n";
 	if (isModEnabled("bookcal") && !empty($bookcalcalendars["calendars"])) {
 		foreach ($bookcalcalendars["calendars"] as $key => $value) {
 			$s .= 'jQuery(".check_bookcal_calendar_'.$value['id'].'").click(function() { console.log("Toggle Bookcal Calendar '.$value['id'].'"); jQuery(".family_bookcal_calendar_'.$value['id'].'").toggle(); });'."\n";
@@ -726,7 +726,7 @@ if (!empty($actioncode)) {
 			$sql .= " AND ca.type != 'systemauto'";
 		} elseif ($actioncode == 'AC_ALL_AUTO') {
 			$sql .= " AND ca.type = 'systemauto'";
-		} else {
+		} elseif (!empty($actioncode) && $actioncode !== '-1') {
 			if (is_array($actioncode)) {
 				$sql .= " AND ca.code IN (".$db->sanitize("'".implode("','", $actioncode)."'", 1).")";
 			} else {
@@ -1063,18 +1063,11 @@ if ($user->hasRight("holiday", "read")) {
 	$sql .= " WHERE u.rowid = x.fk_user";
 	$sql .= " AND u.statut = '1'"; // Show only active users  (0 = inactive user, 1 = active user)
 	$sql .= " AND (x.statut = '2' OR x.statut = '3')"; // Show only public leaves (2 = leave wait for approval, 3 = leave approved)
-
-	if ($mode == 'show_day') {
-		// Request only leaves for the current selected day
-		$sql .= " AND '".$db->escape($year)."-".$db->escape($month)."-".$db->escape($day)."' BETWEEN x.date_debut AND x.date_fin";	// date_debut and date_fin are date without time
-	} elseif ($mode == 'show_week') {
-		// Restrict on current month (we get more, but we will filter later)
-		$sql .= " AND date_debut < '".$db->idate(dol_get_last_day($year, $month))."'";
-		$sql .= " AND date_fin >= '".$db->idate(dol_get_first_day($year, $month))."'";
-	} elseif ($mode == 'show_month') {
-		// Restrict on current month
-		$sql .= " AND date_debut <= '".$db->idate(dol_get_last_day($year, $month))."'";
-		$sql .= " AND date_fin >= '".$db->idate(dol_get_first_day($year, $month))."'";
+	// Restrict on current month (we get more, but we will filter later)
+	$sql .= " AND x.date_debut < '".$db->idate(dol_get_last_day($year, $month))."'";
+	$sql .= " AND x.date_fin >= '".$db->idate(dol_get_first_day($year, $month))."'";
+	if (!$user->hasRight('holiday', 'readall')) {
+		$sql.= " AND x.fk_user IN(".$db->sanitize(implode(", ", $user->getAllChildIds(1))).") ";
 	}
 
 	$resql = $db->query($sql);
@@ -1097,10 +1090,15 @@ if ($user->hasRight("holiday", "read")) {
 			$event->type = 'holiday';
 			$event->type_picto = 'holiday';
 
-			$event->datep                   = $db->jdate($obj->date_start) + (empty($obj->halfday) || $obj->halfday == 1 ? 0 : 12 * 60 * 60 - 1);
+			$event->datep                   = $db->jdate($obj->date_start) + (empty($obj->halfday) || $obj->halfday == 1 ? 0 : 12) * 60 * 60;
 			$event->datef                   = $db->jdate($obj->date_end) + (empty($obj->halfday) || $obj->halfday == -1 ? 24 : 12) * 60 * 60 - 1;
 			$event->date_start_in_calendar  = $event->datep;
 			$event->date_end_in_calendar    = $event->datef;
+
+			$event->transparency = 1;
+
+			$event->userownerid = $obj->uid; // user id of owner
+			$event->userassigned = array($obj->uid => $obj->uid);
 
 			if ($obj->status == 3) {
 				// Show no symbol for leave with state "leave approved"
@@ -1110,24 +1108,44 @@ if ($user->hasRight("holiday", "read")) {
 				$event->percentage = 0;
 			}
 
-			if ($obj->halfday == 1) {
-				$event->label = $obj->lastname.' ('.$langs->trans("Morning").')';
-			} elseif ($obj->halfday == -1) {
-				$event->label = $obj->lastname.' ('.$langs->trans("Afternoon").')';
-			} else {
-				$event->label = $obj->lastname;
-			}
 
 			$daycursor = $event->date_start_in_calendar;
 			$annee = (int) dol_print_date($daycursor, '%Y', 'tzuserrel');
 			$mois = (int) dol_print_date($daycursor, '%m', 'tzuserrel');
 			$jour = (int) dol_print_date($daycursor, '%d', 'tzuserrel');
 
+			$daycursorend = $event->date_end_in_calendar;
+			$anneeend = (int) dol_print_date($daycursorend, '%Y', 'tzuserrel');
+			$moisend = (int) dol_print_date($daycursorend, '%m', 'tzuserrel');
+			$jourend = (int) dol_print_date($daycursorend, '%d', 'tzuserrel');
+
+			// daykey must be date that represent day box in calendar so must be a user time
 			$daykey = dol_mktime(0, 0, 0, $mois, $jour, $annee, 'gmt');
+			$daykeygmt = dol_mktime(0, 0, 0, $mois, $jour, $annee, 'gmt');
+			$ifornbofdays = 0;
 			do {
-				$eventarray[$daykey][] = $event;
+				$ifornbofdays++;
+
+				$firstdayofholiday = ($ifornbofdays == 1);
+				$lastdayofholiday = ($daykeygmt == dol_get_first_hour($event->date_end_in_calendar, 'gmt'));
+
+				//var_dump(dol_print_date($daykeygmt, 'dayhour', 'gmt'));
+
+				if ((in_array($obj->halfday, array(1, 2)) == 1 && $lastdayofholiday) || (in_array($obj->halfday, array(-1, 2)) && $firstdayofholiday)) {
+					// We create a copy of event because we want tochange the label
+					$newevent = dol_clone($event, 1);
+					if (in_array($obj->halfday, array(1, 2)) && $lastdayofholiday) {
+						$newevent->label .= ' ('.$langs->trans("Morning").')';
+					} elseif (in_array($obj->halfday, array(-1, 2)) && $firstdayofholiday) {
+						$newevent->label .= ' ('.$langs->trans("Afternoon").')';
+					}
+					$eventarray[$daykey][] = $newevent;	// We need to use ->gtTypePicto, getXXXon object, so clone must be PHP clone.
+				} else {
+					$eventarray[$daykey][] = $event;	// We can use the event unchanged
+				}
 
 				$daykey += 60 * 60 * 24;
+				$daykeygmt += 60 * 60 * 24;
 			} while ($daykey <= $event->date_end_in_calendar);
 
 			$i++;
@@ -1506,7 +1524,7 @@ echo '<div class="div-table-responsive">';
 $colorsbytype = array();
 
 while ($currentdaytoshow < $lastdaytoshow) {
-	echo '<table class="centpercent noborder nocellnopadd cal_month listwithfilterbefore">';
+	echo '<table class="centpercent noborder nocellnopadd cal_month cal_peruser listwithfilterbefore">';
 
 	echo '<tr class="liste_titre">';
 	echo '<td class="nopaddingtopimp nopaddingbottomimp nowraponsmartphone">';
@@ -1605,7 +1623,7 @@ while ($currentdaytoshow < $lastdaytoshow) {
 			}
 		}
 	} else {
-		/* Use this list to have for all users */
+		/* Use this list to have lines for all users */
 		$sql = "SELECT u.rowid, u.lastname as lastname, u.firstname, u.statut, u.login, u.admin, u.entity";
 		$sql .= " FROM ".$db->prefix()."user as u";
 		if (isModEnabled('multicompany') && getDolGlobalInt('MULTICOMPANY_TRANSVERSE_MODE')) {
@@ -1854,19 +1872,18 @@ function show_day_events2($username, $day, $month, $year, $monthshown, $style, &
 		$annee = (int) dol_print_date($daykey, '%Y', 'tzuserrel');
 		$mois =  (int) dol_print_date($daykey, '%m', 'tzuserrel');
 		$jour =  (int) dol_print_date($daykey, '%d', 'tzuserrel');
-		//var_dump("daykey=$daykey day=$day jour=$jour, month=$month mois=$mois, year=$year annee=$annee");
-
+		//var_dump("daykey=$daykey day=$day jour=$jour, month=$month mois=$mois, year=$year annee=$annee ".dol_print_date($daykey, 'dayhour', 'gmt'));
+		//var_dump($notused);
 
 		if ($day == $jour && (int) $month == $mois && $year == $annee) {	// Is it the day we are looking for when calling function ?
 			//var_dump("day=$day jour=$jour month=$month mois=$mois year=$year annee=$annee");
 
 			// Scan all event for this date
 			foreach ($eventarray[$daykey] as $index => $event) {
-				//print 'daykey='.$daykey.'='.dol_print_date($daykey, 'dayhour', 'gmt').' '.$year.'-'.$month.'-'.$day.' -> This event: '.$event->id.' '.$index.' is open for this daykey '.$annee.'-'.$mois.'-'.$jour."<br>\n";
+				//print 'daykey='.$daykey.'='.dol_print_date($daykey, 'dayhour', 'gmt').' '.$year.'-'.$month.'-'.$day.' -> The event id '.$event->id.' index '.$index.' is open for this daykey '.$annee.'-'.$mois.'-'.$jour."<br>\n";
 				//var_dump($event);
 
 				$keysofuserassigned = array_keys($event->userassigned);
-				$ponct = ($event->date_start_in_calendar == $event->date_end_in_calendar);
 
 				if (!in_array($username->id, $keysofuserassigned)) {
 					continue; // We discard record if event is from another user than user we want to show
@@ -1883,6 +1900,11 @@ function show_day_events2($username, $day, $month, $year, $monthshown, $style, &
 				$color = -1;
 				$cssclass = '';
 				$colorindex = -1;
+
+				if ($event->type_code == 'HOLIDAY') {
+					$cssclass = 'family_holiday';
+				}
+
 				if (in_array($user->id, $keysofuserassigned)) {
 					$cssclass = 'family_mytasks';
 
@@ -1990,30 +2012,35 @@ function show_day_events2($username, $day, $month, $year, $monthshown, $style, &
 								$cases1[$h][$event->id]['string'] .= ' - '.$event->label;
 							}
 							$cases1[$h][$event->id]['typecode'] = $event->type_code;
-							$cases1[$h][$event->id]['color'] = $color;
-							if ($event->fk_project > 0) {
-								if (empty($cacheprojects[$event->fk_project])) {
-									$tmpproj = new Project($db);
-									$tmpproj->fetch($event->fk_project);
-									$cacheprojects[$event->fk_project] = $tmpproj;
+							if ($event->type_code == 'HOLIDAY') {
+								$cases1[$h][$event->id]['css'] = 'peruser_holiday ';
+							} else {
+								$cases1[$h][$event->id]['color'] = $color;
+
+								if ($event->fk_project > 0) {
+									if (empty($cacheprojects[$event->fk_project])) {
+										$tmpproj = new Project($db);
+										$tmpproj->fetch($event->fk_project);
+										$cacheprojects[$event->fk_project] = $tmpproj;
+									}
+									$cases1[$h][$event->id]['string'] .= ', '.$langs->trans("Project").': '.$cacheprojects[$event->fk_project]->ref.' - '.$cacheprojects[$event->fk_project]->title;
 								}
-								$cases1[$h][$event->id]['string'] .= ', '.$langs->trans("Project").': '.$cacheprojects[$event->fk_project]->ref.' - '.$cacheprojects[$event->fk_project]->title;
-							}
-							if ($event->socid > 0) {
-								if (empty($cachethirdparties[$event->socid])) {
-									$tmpthirdparty = new Societe($db);
-									$tmpthirdparty->fetch($event->socid);
-									$cachethirdparties[$event->socid] = $tmpthirdparty;
+								if ($event->socid > 0) {
+									if (empty($cachethirdparties[$event->socid])) {
+										$tmpthirdparty = new Societe($db);
+										$tmpthirdparty->fetch($event->socid);
+										$cachethirdparties[$event->socid] = $tmpthirdparty;
+									}
+									$cases1[$h][$event->id]['string'] .= ', '.$cachethirdparties[$event->socid]->name;
 								}
-								$cases1[$h][$event->id]['string'] .= ', '.$cachethirdparties[$event->socid]->name;
-							}
-							if ($event->contact_id > 0) {
-								if (empty($cachecontacts[$event->contact_id])) {
-									$tmpcontact = new Contact($db);
-									$tmpcontact->fetch($event->contact_id);
-									$cachecontacts[$event->contact_id] = $tmpcontact;
+								if ($event->contact_id > 0) {
+									if (empty($cachecontacts[$event->contact_id])) {
+										$tmpcontact = new Contact($db);
+										$tmpcontact->fetch($event->contact_id);
+										$cachecontacts[$event->contact_id] = $tmpcontact;
+									}
+									$cases1[$h][$event->id]['string'] .= ', '.$cachecontacts[$event->contact_id]->getFullName($langs);
 								}
-								$cases1[$h][$event->id]['string'] .= ', '.$cachecontacts[$event->contact_id]->getFullName($langs);
 							}
 						}
 						if ($event->date_start_in_calendar < $b1 && $dateendtouse > $b) {
@@ -2033,30 +2060,35 @@ function show_day_events2($username, $day, $month, $year, $monthshown, $style, &
 								$cases2[$h][$event->id]['string'] .= ' - '.$event->label;
 							}
 							$cases2[$h][$event->id]['typecode'] = $event->type_code;
-							$cases2[$h][$event->id]['color'] = $color;
-							if ($event->fk_project > 0) {
-								if (empty($cacheprojects[$event->fk_project])) {
-									$tmpproj = new Project($db);
-									$tmpproj->fetch($event->fk_project);
-									$cacheprojects[$event->fk_project] = $tmpproj;
+							if ($event->type_code == 'HOLIDAY') {
+								$cases2[$h][$event->id]['css'] = 'peruser_holiday ';
+							} else {
+								$cases2[$h][$event->id]['color'] = $color;
+
+								if ($event->fk_project > 0) {
+									if (empty($cacheprojects[$event->fk_project])) {
+										$tmpproj = new Project($db);
+										$tmpproj->fetch($event->fk_project);
+										$cacheprojects[$event->fk_project] = $tmpproj;
+									}
+									$cases2[$h][$event->id]['string'] .= ', '.$langs->trans("Project").': '.$cacheprojects[$event->fk_project]->ref.' - '.$cacheprojects[$event->fk_project]->title;
 								}
-								$cases2[$h][$event->id]['string'] .= ', '.$langs->trans("Project").': '.$cacheprojects[$event->fk_project]->ref.' - '.$cacheprojects[$event->fk_project]->title;
-							}
-							if ($event->socid > 0) {
-								if (empty($cachethirdparties[$event->socid])) {
-									$tmpthirdparty = new Societe($db);
-									$tmpthirdparty->fetch($event->socid);
-									$cachethirdparties[$event->socid] = $tmpthirdparty;
+								if ($event->socid > 0) {
+									if (empty($cachethirdparties[$event->socid])) {
+										$tmpthirdparty = new Societe($db);
+										$tmpthirdparty->fetch($event->socid);
+										$cachethirdparties[$event->socid] = $tmpthirdparty;
+									}
+									$cases2[$h][$event->id]['string'] .= ', '.$cachethirdparties[$event->socid]->name;
 								}
-								$cases2[$h][$event->id]['string'] .= ', '.$cachethirdparties[$event->socid]->name;
-							}
-							if ($event->contact_id > 0) {
-								if (empty($cachecontacts[$event->contact_id])) {
-									$tmpcontact = new Contact($db);
-									$tmpcontact->fetch($event->contact_id);
-									$cachecontacts[$event->contact_id] = $tmpcontact;
+								if ($event->contact_id > 0) {
+									if (empty($cachecontacts[$event->contact_id])) {
+										$tmpcontact = new Contact($db);
+										$tmpcontact->fetch($event->contact_id);
+										$cachecontacts[$event->contact_id] = $tmpcontact;
+									}
+									$cases2[$h][$event->id]['string'] .= ', '.$cachecontacts[$event->contact_id]->getFullName($langs);
 								}
-								$cases2[$h][$event->id]['string'] .= ', '.$cachecontacts[$event->contact_id]->getFullName($langs);
 							}
 						}
 						if ($event->date_start_in_calendar < $b2 && $dateendtouse > $b1) {
@@ -2076,30 +2108,35 @@ function show_day_events2($username, $day, $month, $year, $monthshown, $style, &
 								$cases3[$h][$event->id]['string'] .= ' - '.$event->label;
 							}
 							$cases3[$h][$event->id]['typecode'] = $event->type_code;
-							$cases3[$h][$event->id]['color'] = $color;
-							if ($event->fk_project > 0) {
-								if (empty($cacheprojects[$event->fk_project])) {
-									$tmpproj = new Project($db);
-									$tmpproj->fetch($event->fk_project);
-									$cacheprojects[$event->fk_project] = $tmpproj;
+							if ($event->type_code == 'HOLIDAY') {
+								$cases3[$h][$event->id]['css'] .= 'peruser_holiday ';
+							} else {
+								$cases3[$h][$event->id]['color'] = $color;
+
+								if ($event->fk_project > 0) {
+									if (empty($cacheprojects[$event->fk_project])) {
+										$tmpproj = new Project($db);
+										$tmpproj->fetch($event->fk_project);
+										$cacheprojects[$event->fk_project] = $tmpproj;
+									}
+									$cases3[$h][$event->id]['string'] .= ', '.$langs->trans("Project").': '.$cacheprojects[$event->fk_project]->ref.' - '.$cacheprojects[$event->fk_project]->title;
 								}
-								$cases3[$h][$event->id]['string'] .= ', '.$langs->trans("Project").': '.$cacheprojects[$event->fk_project]->ref.' - '.$cacheprojects[$event->fk_project]->title;
-							}
-							if ($event->socid > 0) {
-								if (empty($cachethirdparties[$event->socid])) {
-									$tmpthirdparty = new Societe($db);
-									$tmpthirdparty->fetch($event->socid);
-									$cachethirdparties[$event->socid] = $tmpthirdparty;
+								if ($event->socid > 0) {
+									if (empty($cachethirdparties[$event->socid])) {
+										$tmpthirdparty = new Societe($db);
+										$tmpthirdparty->fetch($event->socid);
+										$cachethirdparties[$event->socid] = $tmpthirdparty;
+									}
+									$cases3[$h][$event->id]['string'] .= ', '.$cachethirdparties[$event->socid]->name;
 								}
-								$cases3[$h][$event->id]['string'] .= ', '.$cachethirdparties[$event->socid]->name;
-							}
-							if ($event->contact_id > 0) {
-								if (empty($cachecontacts[$event->contact_id])) {
-									$tmpcontact = new Contact($db);
-									$tmpcontact->fetch($event->contact_id);
-									$cachecontacts[$event->contact_id] = $tmpcontact;
+								if ($event->contact_id > 0) {
+									if (empty($cachecontacts[$event->contact_id])) {
+										$tmpcontact = new Contact($db);
+										$tmpcontact->fetch($event->contact_id);
+										$cachecontacts[$event->contact_id] = $tmpcontact;
+									}
+									$cases3[$h][$event->id]['string'] .= ', '.$cachecontacts[$event->contact_id]->getFullName($langs);
 								}
-								$cases3[$h][$event->id]['string'] .= ', '.$cachecontacts[$event->contact_id]->getFullName($langs);
 							}
 						}
 						if ($event->date_start_in_calendar < $c && $dateendtouse > $b2) {
@@ -2119,30 +2156,35 @@ function show_day_events2($username, $day, $month, $year, $monthshown, $style, &
 								$cases4[$h][$event->id]['string'] .= ' - '.$event->label;
 							}
 							$cases4[$h][$event->id]['typecode'] = $event->type_code;
-							$cases4[$h][$event->id]['color'] = $color;
-							if ($event->fk_project > 0) {
-								if (empty($cacheprojects[$event->fk_project])) {
-									$tmpproj = new Project($db);
-									$tmpproj->fetch($event->fk_project);
-									$cacheprojects[$event->fk_project] = $tmpproj;
+							if ($event->type_code == 'HOLIDAY') {
+								$cases4[$h][$event->id]['css'] = 'peruser_holiday ';
+							} else {
+								$cases4[$h][$event->id]['color'] = $color;
+
+								if ($event->fk_project > 0) {
+									if (empty($cacheprojects[$event->fk_project])) {
+										$tmpproj = new Project($db);
+										$tmpproj->fetch($event->fk_project);
+										$cacheprojects[$event->fk_project] = $tmpproj;
+									}
+									$cases4[$h][$event->id]['string'] .= ', '.$langs->trans("Project").': '.$cacheprojects[$event->fk_project]->ref.' - '.$cacheprojects[$event->fk_project]->title;
 								}
-								$cases4[$h][$event->id]['string'] .= ', '.$langs->trans("Project").': '.$cacheprojects[$event->fk_project]->ref.' - '.$cacheprojects[$event->fk_project]->title;
-							}
-							if ($event->socid > 0) {
-								if (empty($cachethirdparties[$event->socid])) {
-									$tmpthirdparty = new Societe($db);
-									$tmpthirdparty->fetch($event->socid);
-									$cachethirdparties[$event->socid] = $tmpthirdparty;
+								if ($event->socid > 0) {
+									if (empty($cachethirdparties[$event->socid])) {
+										$tmpthirdparty = new Societe($db);
+										$tmpthirdparty->fetch($event->socid);
+										$cachethirdparties[$event->socid] = $tmpthirdparty;
+									}
+									$cases4[$h][$event->id]['string'] .= ', '.$cachethirdparties[$event->socid]->name;
 								}
-								$cases4[$h][$event->id]['string'] .= ', '.$cachethirdparties[$event->socid]->name;
-							}
-							if ($event->contact_id > 0) {
-								if (empty($cachecontacts[$event->contact_id])) {
-									$tmpcontact = new Contact($db);
-									$tmpcontact->fetch($event->contact_id);
-									$cachecontacts[$event->contact_id] = $tmpcontact;
+								if ($event->contact_id > 0) {
+									if (empty($cachecontacts[$event->contact_id])) {
+										$tmpcontact = new Contact($db);
+										$tmpcontact->fetch($event->contact_id);
+										$cachecontacts[$event->contact_id] = $tmpcontact;
+									}
+									$cases4[$h][$event->id]['string'] .= ', '.$cachecontacts[$event->contact_id]->getFullName($langs);
 								}
-								$cases4[$h][$event->id]['string'] .= ', '.$cachecontacts[$event->contact_id]->getFullName($langs);
 							}
 						}
 					} else {
@@ -2163,6 +2205,10 @@ function show_day_events2($username, $day, $month, $year, $monthshown, $style, &
 						$cases2[$h][$event->id]['color'] = $color;
 						$cases3[$h][$event->id]['color'] = $color;
 						$cases4[$h][$event->id]['color'] = $color;
+						$cases1[$h][$event->id]['css'] = '';
+						$cases2[$h][$event->id]['css'] = '';
+						$cases3[$h][$event->id]['css'] = '';
+						$cases4[$h][$event->id]['css'] = '';
 					}
 				}
 				$i++;
@@ -2178,10 +2224,10 @@ function show_day_events2($username, $day, $month, $year, $monthshown, $style, &
 		$color2 = '';
 		$color3 = '';
 		$color4 = '';
-		$style1 = '';
-		$style2 = '';
-		$style3 = '';
-		$style4 = '';
+		$style1 = 'onclickopenref ';
+		$style2 = 'onclickopenref ';
+		$style3 = 'onclickopenref ';
+		$style4 = 'onclickopenref ';
 		$string1 = '&nbsp;';
 		$string2 = '&nbsp;';
 		$string3 = '&nbsp;';
@@ -2197,13 +2243,16 @@ function show_day_events2($username, $day, $month, $year, $monthshown, $style, &
 			}
 
 			if (!getDolGlobalString('AGENDA_NO_TRANSPARENT_ON_NOT_BUSY')) {
-				$style1 = 'peruser_notbusy';
+				$style1 .= 'peruser_notbusy ';
 			} else {
-				$style1 = 'peruser_busy';
+				$style1 .= 'peruser_busy ';
 			}
 			foreach ($cases1[$h] as $id => $ev) {
 				if ($ev['busy']) {
-					$style1 = 'peruser_busy';
+					$style1 = 'onclickopenref peruser_busy';
+				}
+				if ($ev['css']) {
+					$style1 .= ' '.$ev['css'];
 				}
 			}
 		}
@@ -2214,13 +2263,16 @@ function show_day_events2($username, $day, $month, $year, $monthshown, $style, &
 			}
 
 			if (!getDolGlobalString('AGENDA_NO_TRANSPARENT_ON_NOT_BUSY')) {
-				$style2 = 'peruser_notbusy';
+				$style2 .= 'peruser_notbusy ';
 			} else {
-				$style2 = 'peruser_busy';
+				$style2 .= 'peruser_busy ';
 			}
 			foreach ($cases2[$h] as $id => $ev) {
 				if ($ev['busy']) {
-					$style2 = 'peruser_busy';
+					$style2 = 'onclickopenref peruser_busy';
+				}
+				if ($ev['css']) {
+					$style2 .= ' '.$ev['css'];
 				}
 			}
 		}
@@ -2231,13 +2283,16 @@ function show_day_events2($username, $day, $month, $year, $monthshown, $style, &
 			}
 
 			if (!getDolGlobalString('AGENDA_NO_TRANSPARENT_ON_NOT_BUSY')) {
-				$style3 = 'peruser_notbusy';
+				$style3 .= 'peruser_notbusy ';
 			} else {
-				$style3 = 'peruser_busy';
+				$style3 .= 'peruser_busy ';
 			}
 			foreach ($cases3[$h] as $id => $ev) {
 				if ($ev['busy']) {
-					$style3 = 'peruser_busy';
+					$style3 = 'onclickopenref peruser_busy';
+				}
+				if ($ev['css']) {
+					$style3 .= ' '.$ev['css'];
 				}
 			}
 		}
@@ -2248,13 +2303,16 @@ function show_day_events2($username, $day, $month, $year, $monthshown, $style, &
 			}
 
 			if (!getDolGlobalString('AGENDA_NO_TRANSPARENT_ON_NOT_BUSY')) {
-				$style4 = 'peruser_notbusy';
+				$style4 .= 'peruser_notbusy ';
 			} else {
-				$style4 = 'peruser_busy';
+				$style4 .= 'peruser_busy ';
 			}
 			foreach ($cases4[$h] as $id => $ev) {
 				if ($ev['busy']) {
-					$style4 = 'peruser_busy';
+					$style4 = 'onclickopenref peruser_busy';
+				}
+				if ($ev['css']) {
+					$style4 .= ' '.$ev['css'];
 				}
 			}
 		}
@@ -2351,7 +2409,7 @@ function show_day_events2($username, $day, $month, $year, $monthshown, $style, &
 		}
 		print 'class="';
 		print($style1 ? $style1.' ' : '');
-		print 'onclickopenref center'.($title2 ? ' classfortooltip' : '').($title1 ? ' cursorpointer' : '').'" ref="ref_'.$username->id.'_'.sprintf("%04d", $year).'_'.sprintf("%02d", $month).'_'.sprintf("%02d", $day).'_'.sprintf("%02d", $h).'_00_'.($ids1 ? $ids1 : 'none').'"'.($title1 ? ' title="'.$title1.'"' : '').'>';
+		print 'center'.($title2 ? ' classfortooltip' : '').($title1 ? ' cursorpointer' : '').'" ref="ref_'.$username->id.'_'.sprintf("%04d", $year).'_'.sprintf("%02d", $month).'_'.sprintf("%02d", $day).'_'.sprintf("%02d", $h).'_00_'.($ids1 ? $ids1 : 'none').'"'.($title1 ? ' title="'.$title1.'"' : '').'>';
 		print $string1;
 		print '</td>';
 
@@ -2363,7 +2421,7 @@ function show_day_events2($username, $day, $month, $year, $monthshown, $style, &
 		}
 		print 'class="';
 		print($style2 ? $style2.' ' : '');
-		print 'onclickopenref center'.($title2 ? ' classfortooltip' : '').($title1 ? ' cursorpointer' : '').'" ref="ref_'.$username->id.'_'.sprintf("%04d", $year).'_'.sprintf("%02d", $month).'_'.sprintf("%02d", $day).'_'.sprintf("%02d", $h).'_15_'.($ids2 ? $ids2 : 'none').'"'.($title2 ? ' title="'.$title2.'"' : '').'>';
+		print 'center'.($title2 ? ' classfortooltip' : '').($title1 ? ' cursorpointer' : '').'" ref="ref_'.$username->id.'_'.sprintf("%04d", $year).'_'.sprintf("%02d", $month).'_'.sprintf("%02d", $day).'_'.sprintf("%02d", $h).'_15_'.($ids2 ? $ids2 : 'none').'"'.($title2 ? ' title="'.$title2.'"' : '').'>';
 		print $string2;
 		print '</td>';
 
@@ -2375,7 +2433,7 @@ function show_day_events2($username, $day, $month, $year, $monthshown, $style, &
 		}
 		print 'class="';
 		print($style3 ? $style3.' ' : '');
-		print 'onclickopenref center'.($title2 ? ' classfortooltip' : '').($title3 ? ' cursorpointer' : '').'" ref="ref_'.$username->id.'_'.sprintf("%04d", $year).'_'.sprintf("%02d", $month).'_'.sprintf("%02d", $day).'_'.sprintf("%02d", $h).'_30_'.($ids3 ? $ids3 : 'none').'"'.($title3 ? ' title="'.$title3.'"' : '').'>';
+		print 'center'.($title2 ? ' classfortooltip' : '').($title3 ? ' cursorpointer' : '').'" ref="ref_'.$username->id.'_'.sprintf("%04d", $year).'_'.sprintf("%02d", $month).'_'.sprintf("%02d", $day).'_'.sprintf("%02d", $h).'_30_'.($ids3 ? $ids3 : 'none').'"'.($title3 ? ' title="'.$title3.'"' : '').'>';
 		print $string3;
 		print '</td>';
 
@@ -2387,7 +2445,7 @@ function show_day_events2($username, $day, $month, $year, $monthshown, $style, &
 		}
 		print 'class="';
 		print($style4 ? $style4.' ' : '');
-		print 'onclickopenref center'.($title3 ? ' classfortooltip' : '').($title4 ? ' cursorpointer' : '').'" ref="ref_'.$username->id.'_'.sprintf("%04d", $year).'_'.sprintf("%02d", $month).'_'.sprintf("%02d", $day).'_'.sprintf("%02d", $h).'_45_'.($ids4 ? $ids4 : 'none').'"'.($title4 ? ' title="'.$title4.'"' : '').'>';
+		print 'center'.($title3 ? ' classfortooltip' : '').($title4 ? ' cursorpointer' : '').'" ref="ref_'.$username->id.'_'.sprintf("%04d", $year).'_'.sprintf("%02d", $month).'_'.sprintf("%02d", $day).'_'.sprintf("%02d", $h).'_45_'.($ids4 ? $ids4 : 'none').'"'.($title4 ? ' title="'.$title4.'"' : '').'>';
 		print $string4;
 		print '</td>';
 
