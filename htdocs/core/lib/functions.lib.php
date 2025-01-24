@@ -987,8 +987,14 @@ function GETPOST($paramname, $check = 'alphanohtml', $method = 0, $filter = null
 											$out = dol_string_nospecial($user->default_values[$relativepathstring]['filters'][$defkey][$paramname], '', $forbidden_chars_to_replace);
 										}
 									} else {
-										$forbidden_chars_to_replace = array(" ", "'", "/", "\\", ":", "*", "?", "\"", "<", ">", "|", "[", "]", ";", "="); // we accept _, -, . and ,
-										$out = dol_string_nospecial($user->default_values[$relativepathstring]['filters'][$defkey][$paramname], '', $forbidden_chars_to_replace);
+										// Check if the value is a json format for use with multiselect field, eg ["1","2"]
+										if (preg_match('/^\[.*\]$/', $user->default_values[$relativepathstring]['filters'][$defkey][$paramname])) {
+											$out = json_decode($user->default_values[$relativepathstring]['filters'][$defkey][$paramname], true);
+											$check = 'array'; // force to check an array
+										} else {
+											$forbidden_chars_to_replace = array(" ", "'", "/", "\\", ":", "*", "?", "\"", "<", ">", "|", "[", "]", ";", "="); // we accept _, -, . and ,
+											$out = dol_string_nospecial($user->default_values[$relativepathstring]['filters'][$defkey][$paramname], '', $forbidden_chars_to_replace);
+										}
 									}
 									break;
 								}
