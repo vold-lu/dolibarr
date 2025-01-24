@@ -16165,12 +16165,6 @@ parameters:
 			path: ../../../htdocs/core/triggers/interface_50_modTicket_TicketEmail.class.php
 
 		-
-			message: '#^Variable \$old_MAIN_MAIL_AUTOCOPY_TO might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../../htdocs/core/triggers/interface_50_modTicket_TicketEmail.class.php
-
-		-
 			message: '#^Call to function method_exists\(\) with Contact and ''getContactRoles'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -22335,30 +22329,6 @@ parameters:
 		-
 			message: '#^Right side of && is always true\.$#'
 			identifier: booleanAnd.rightAlwaysTrue
-			count: 1
-			path: ../../../htdocs/loan/payment/payment.php
-
-		-
-			message: '#^Variable \$amount_capital might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../../htdocs/loan/payment/payment.php
-
-		-
-			message: '#^Variable \$amount_insurance might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../../htdocs/loan/payment/payment.php
-
-		-
-			message: '#^Variable \$amount_interest might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../../htdocs/loan/payment/payment.php
-
-		-
-			message: '#^Variable \$line_id might not be defined\.$#'
-			identifier: variable.undefined
 			count: 1
 			path: ../../../htdocs/loan/payment/payment.php
 
@@ -31899,12 +31869,6 @@ parameters:
 		-
 			message: '#^Loose comparison using \!\= between ''ErrorProductAlready…'' and ''ErrorProductAlready…'' will always evaluate to false\.$#'
 			identifier: notEqual.alwaysFalse
-			count: 1
-			path: ../../../htdocs/variants/class/ProductCombination.class.php
-
-		-
-			message: '#^Negated boolean expression is always false\.$#'
-			identifier: booleanNot.alwaysFalse
 			count: 1
 			path: ../../../htdocs/variants/class/ProductCombination.class.php
 

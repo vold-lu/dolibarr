@@ -1065,7 +1065,8 @@ function GETPOST($paramname, $check = 'alphanohtml', $method = 0, $filter = null
 	// Check type of variable and make sanitization according to this
 	if (preg_match('/^array/', $check)) {	// If 'array' or 'array:restricthtml' or 'array:aZ09' or 'array:intcomma'
 		if (!is_array($out) || empty($out)) {
-			$out = array();
+			$out = explode(',', $out);
+			$tmpcheck = 'alphanohtml';
 		} else {
 			$tmparray = explode(':', $check);
 			if (!empty($tmparray[1])) {
@@ -1073,9 +1074,9 @@ function GETPOST($paramname, $check = 'alphanohtml', $method = 0, $filter = null
 			} else {
 				$tmpcheck = 'alphanohtml';
 			}
-			foreach ($out as $outkey => $outval) {
-				$out[$outkey] = sanitizeVal($outval, $tmpcheck, $filter, $options);
-			}
+		}
+		foreach ($out as $outkey => $outval) {
+			$out[$outkey] = sanitizeVal($outval, $tmpcheck, $filter, $options);
 		}
 	} else {
 		// If field name is 'search_xxx' then we force the add of space after each < and > (when following char is numeric) because it means
@@ -3217,18 +3218,8 @@ function dol_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $fieldi
 			$morehtmlstatus .= $object->getLibStatut(5);
 		}
 	} elseif ($object->element == 'project_task') {
-		$object->fk_statut = 1;
-		$object->status = 1;
-		if ($object->progress > 0) {
-			$object->fk_statut = 2;
-			$object->status = 2;
-		}
-		if ($object->progress >= 100) {
-			$object->fk_statut = 3;
-			$object->status = 3;
-		}
-		$tmptxt = $object->getLibStatut(5);
-		$morehtmlstatus .= $tmptxt; // No status on task
+		$tmptxt = $object->getLibStatut(4);
+		$morehtmlstatus .= $tmptxt;
 	} elseif (method_exists($object, 'getLibStatut')) { // Generic case for status
 		$tmptxt = $object->getLibStatut(6);
 		if (empty($tmptxt) || $tmptxt == $object->getLibStatut(3)) {

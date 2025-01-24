@@ -11,7 +11,7 @@
  * Copyright (C) 2015       Raphaël Doursenaud      <rdoursenaud@gpcsolutions.fr>
  * Copyright (C) 2017       Rui Strecht             <rui.strecht@aliartalentos.com>
  * Copyright (C) 2018-2024  Ferran Marcet           <fmarcet@2byte.es>
- * Copyright (C) 2024		MDW							<mdeweerd@users.noreply.github.com>
+ * Copyright (C) 2024-2025	MDW						<mdeweerd@users.noreply.github.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1909,7 +1909,7 @@ function show_actions_done($conf, $langs, $db, $filterobj, $objcon = null, $nopr
 		} elseif (is_object($filterobj) && get_class($filterobj) == 'Contrat') {
 			$sql .= ", ".MAIN_DB_PREFIX."contrat as o";
 		} elseif (is_object($filterobj) && is_array($filterobj->fields) && is_array($filterobj->fields['rowid'])
-		&& ((!empty($filterobj->fields['ref']) && is_array($filterobj->fields['ref'])) || (!empty($filterobj->fields['label']) && is_array($filterobj->fields['label'])) || (!empty($filterobj->fields['titre']) && is_array($filterobj->fields['titre'])))  // @phan-suppress-curren-line PhanTypeInvalidDimOffset
+		&& ((!empty($filterobj->fields['ref']) && is_array($filterobj->fields['ref'])) || (!empty($filterobj->fields['label']) && is_array($filterobj->fields['label'])) || (!empty($filterobj->fields['titre']) && is_array($filterobj->fields['titre'])))  // @phan-suppress-current-line PhanTypeInvalidDimOffset
 		&& $filterobj->table_element && $filterobj->element) {
 			$sql .= ", ".MAIN_DB_PREFIX.$filterobj->table_element." as o";
 		}
