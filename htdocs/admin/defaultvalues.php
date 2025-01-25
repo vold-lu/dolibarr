@@ -311,9 +311,7 @@ if ($mode != 'focus' && $mode != 'mandatory') {
 		foreach ($substitutionarray as $key => $val) {
 			$texthelp .= $key.' -> '.$val.'<br>';
 		}
-		$texthelp2 = $langs->trans("DefaultValuesHelpText");
-		$text = $form->textwithpicto($langs->trans("Value"), $texthelp2);
-		$textvalue = $form->textwithpicto($text, $texthelp, 1, 'list-alt', 'valignmiddle', 0, 2, 'subsitutiontooltip');
+		$textvalue = $form->textwithpicto($langs->trans("Value"), $langs->trans("DefaultValuesHelpText"));
 	} else {
 		$texthelp = 'ASC or DESC';
 		$textvalue = $form->textwithpicto($langs->trans("SortOrder"), $texthelp);
@@ -347,6 +345,7 @@ print '</td>';
 if ($mode != 'focus' && $mode != 'mandatory') {
 	print '<td>';
 	print '<input type="text" class="flat maxwidth100onsmartphone" name="defaultvalue" value="'.dol_escape_htmltag($defaultvalue).'">';
+	print $form->textwithpicto('', $texthelp, 1, 'list-alt', 'paddingleftimp cursorpointer', 0, 2, 'subsitutiontooltip');
 	print '</td>';
 }
 // Limit to superadmin
