@@ -2932,11 +2932,11 @@ img.photorefnoborder {
 	display:none;
 <?php } else { ?>
 	background: var(--colorbackhmenu1);
-	/* background-image: linear-gradient(-45deg, <?php echo colorAdjustBrightness(colorArrayToHex(colorStringToArray($colorbackhmenu1)), '5'); ?>, var(--colorbackhmenu1)); */
-	<?php if ($colorbackhmenu1 == '255,255,255') { ?>
-	box-shadow: 0px 0px 4px #ddd;
-	<?php } ?>
-<?php } ?>
+	<?php if ($colorbackhmenu1 == $colorbackbody) { ?>
+	border-bottom: 1px solid var(--colorbackgrey);
+	box-shadow: 0 0 3px var(--colorbackgrey);
+	<?php } else { ?>
+	<?php } } ?>
 }
 
 div#tmenu_tooltip {
