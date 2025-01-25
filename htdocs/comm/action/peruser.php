@@ -853,7 +853,7 @@ if ($resql) {
 		$event = new ActionComm($db);
 
 		$event->id = $obj->id;
-		$event->ref = $event->id;
+		$event->ref = (string) $event->id;
 
 		$event->fulldayevent = $obj->fulldayevent;
 
@@ -1008,7 +1008,7 @@ if ($showbirthday) {
 			$event = new ActionComm($db);
 
 			$event->id = $obj->rowid; // We put contact id in action id for birthdays events
-			$event->ref = $event->id;
+			$event->ref = (string) $event->id;
 
 			$datebirth = dol_stringtotime($obj->birthday, 1);
 			//print 'ee'.$obj->birthday.'-'.$datebirth;
@@ -1081,8 +1081,8 @@ if ($user->hasRight("holiday", "read")) {
 			$event = new ActionComm($db);
 
 			// Need the id of the leave object for link to it
-			$event->id                      = $obj->rowid;
-			$event->ref                     = $event->id;
+			$event->id = $obj->rowid;
+			$event->ref = (string) $event->id;
 
 			$event->type_code = 'HOLIDAY';
 			$event->type_label = '';
@@ -1344,7 +1344,7 @@ if (count($listofextcals)) {
 
 				if ($addevent) {
 					$event->id = $icalevent['UID'];
-					$event->ref = $event->id;
+					$event->ref = (string) $event->id;
 					$userstatic = new User($db);
 					$userId = $userstatic->findUserIdByEmail($namecal);
 					if (!empty($userId) && $userId > 0) {
@@ -1532,7 +1532,7 @@ while ($currentdaytoshow < $lastdaytoshow) {
 	echo '<tr class="liste_titre">';
 	echo '<td class="nopaddingtopimp nopaddingbottomimp nowraponsmartphone">';
 
-	if ($canedit && $mode == 'show_peruser') {
+	if ($canedit /* && $mode == 'show_peruser' */) { // mode is forced to show_peruser
 		// Filter on days
 		print '<span class="hideonsmartphone" title="'.$langs->trans("VisibleDaysRange").'">';
 		print img_picto('', 'clock', 'class="fawidth30 inline-block marginleftonly"');

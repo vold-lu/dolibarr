@@ -3769,12 +3769,6 @@ parameters:
 			path: ../../htdocs/comm/action/peruser.php
 
 		-
-			message: '#^Loose comparison using \=\= between ''show_peruser'' and ''show_peruser'' will always evaluate to true\.$#'
-			identifier: equal.alwaysTrue
-			count: 1
-			path: ../../htdocs/comm/action/peruser.php
-
-		-
 			message: '#^Loose comparison using \=\= between ''show_peruser'' and ''show_week'' will always evaluate to false\.$#'
 			identifier: equal.alwaysFalse
 			count: 1
