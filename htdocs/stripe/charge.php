@@ -250,7 +250,7 @@ if (!$rowid) {
 			print "</td>\n";
 
 			// Link
-			print "<td>";
+			print '<td class="tdoverflowmax200">';
 			if ($societestatic->id > 0) {
 				print $societestatic->getNomUrl(1);
 			} elseif ($memberstatic->id > 0) {
