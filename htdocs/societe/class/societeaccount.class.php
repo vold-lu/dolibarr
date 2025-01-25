@@ -162,6 +162,12 @@ class SocieteAccount extends CommonObject
 	 * @var string
 	 */
 	public $site;
+
+	/**
+	 * @var int
+	 */
+	public $fk_website;
+
 	/**
 	 * @var ?string
 	 */
