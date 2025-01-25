@@ -9891,7 +9891,7 @@ class Form
 			$reshook = $hookmanager->executeHooks('printFieldListWhere', $parameters, $object); // Note that $action and $object may have been modified by hook
 			if (!empty($hookmanager->resPrint)) {
 				if (empty($object->next_prev_filter) && preg_match('/^\s*AND/i', $hookmanager->resPrint)) {
-					$hookmanager->resPrint = preg_replace('/^\s*AND\s*/i', '', $hookmanager->resPrint);
+					$object->next_prev_filter = preg_replace('/^\s*AND\s*/i', '', $hookmanager->resPrint);
 				} elseif (!empty($object->next_prev_filter) && !preg_match('/^\s*AND/i', $hookmanager->resPrint)) {
 					$object->next_prev_filter .= ' AND '.$hookmanager->resPrint;
 				} else {
