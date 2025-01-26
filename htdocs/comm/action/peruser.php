@@ -1350,6 +1350,7 @@ if (count($listofextcals)) {
 					if (!empty($userId) && $userId > 0) {
 						$event->userassigned[$userId] = [
 							'id' => $userId,
+							'transparency' => 1,
 						];
 						$event->percentage = -1;
 					}
