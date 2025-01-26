@@ -323,28 +323,28 @@ function dolSavePageContent($filetpl, Website $object, WebsitePage $objectpage, 
 		$tplcontent .= "// Now fix the content for SEO or multilanguage\n";
 		// Old method for custom SEO
 		if (strpos($objectpage->content, '$__PAGE__KEYWORDS__') !== false) {
-			$tplcontent .= '$tmp = preg_replace("/^<meta name=\"keywords\" content=\".*?\" \/>/ms", "<meta name=\"keywords\" content=\"" . dol_string_nohtmltag($__PAGE__KEYWORDS__) . "\"  />", $tmp);'."\n";
+			$tplcontent .= '$tmp = preg_replace("/^<meta name=\"keywords\" content=\".*?\" \/>/ms", "<meta name=\"keywords\" content=\"" . dolPrintHTMLForAttribute($__PAGE__KEYWORDS__, 1) . "\"  />", $tmp);'."\n";
 		}
 		if (strpos($objectpage->content, '$__PAGE__TITLE__') !== false) {
-			$tplcontent .= '$tmp = preg_replace("/^<title>.*?<\/title>/ms", "<title>" . dol_escape_htmltag($__PAGE__TITLE__) . "</title>", $tmp);'."\n";
-			$tplcontent .= '$tmp = preg_replace("/^<meta name=\"title\" content=\".*?\" \/>/ms", "<meta name=\"title\" content=\"" . dol_string_nohtmltag($__PAGE__TITLE__) . "\"  />", $tmp);'."\n";
+			$tplcontent .= '$tmp = preg_replace("/^<title>.*?<\/title>/ms", "<title>" . dolPrintHTMLForAttribute($__PAGE__TITLE__) . "</title>", $tmp);'."\n";
+			$tplcontent .= '$tmp = preg_replace("/^<meta name=\"title\" content=\".*?\" \/>/ms", "<meta name=\"title\" content=\"" . dolPrintHTMLForAttribute($__PAGE__TITLE__) . "\"  />", $tmp);'."\n";
 		}
 		if (strpos($objectpage->content, '$__PAGE__DESC__') !== false) {
-			$tplcontent .= '$tmp = preg_replace("/^<meta name=\"description\" content=\".*?\" \/>/ms", "<meta name=\"description\" content=\"" . dol_string_nohtmltag($__PAGE__DESC__) . "\"  />", $tmp);'."\n";
+			$tplcontent .= '$tmp = preg_replace("/^<meta name=\"description\" content=\".*?\" \/>/ms", "<meta name=\"description\" content=\"" . dolPrintHTMLForAttribute($__PAGE__DESC__) . "\"  />", $tmp);'."\n";
 		}
 		// New method for custom SEO
 		if (strpos($objectpage->content, 'define("__SEO_PAGE_KEYWORDS__"') !== false) {
-			$tplcontent .= '$tmp = preg_replace("/^<meta name=\"keywords\" content=\".*?\" \/>/ms", "<meta name=\"keywords\" content=\"" . dol_string_nohtmltag(constant("__SEO_PAGE_KEYWORDS__")) . "\"  />", $tmp);'."\n";
+			$tplcontent .= '$tmp = preg_replace("/^<meta name=\"keywords\" content=\".*?\" \/>/ms", "<meta name=\"keywords\" content=\"" . dolPrintHTMLForAttribute(constant("__SEO_PAGE_KEYWORDS__")) . "\"  />", $tmp);'."\n";
 		}
 		if (strpos($objectpage->content, 'define("__SEO_PAGE_TITLE__"') !== false) {
-			$tplcontent .= '$tmp = preg_replace("/^<title>.*?<\/title>/ms", "<title>" . dol_escape_htmltag(constant("__SEO_PAGE_TITLE__")) . "</title>", $tmp);'."\n";
-			$tplcontent .= '$tmp = preg_replace("/^<meta name=\"title\" content=\".*?\" \/>/ms", "<meta name=\"title\" content=\"" . dol_string_nohtmltag(constant("__SEO_PAGE_TITLE__")) . "\"  />", $tmp);'."\n";
+			$tplcontent .= '$tmp = preg_replace("/^<title>.*?<\/title>/ms", "<title>" . dolPrintHTMLForAttribute(constant("__SEO_PAGE_TITLE__")) . "</title>", $tmp);'."\n";
+			$tplcontent .= '$tmp = preg_replace("/^<meta name=\"title\" content=\".*?\" \/>/ms", "<meta name=\"title\" content=\"" . dolPrintHTMLForAttribute(constant("__SEO_PAGE_TITLE__")) . "\"  />", $tmp);'."\n";
 		}
 		if (strpos($objectpage->content, 'define("__SEO_PAGE_DESC__"') !== false) {
-			$tplcontent .= '$tmp = preg_replace("/^<meta name=\"description\" content=\".*?\" \/>/ms", "<meta name=\"description\" content=\"" . dol_string_nohtmltag(constant("__SEO_PAGE_DESC__")) . "\"  />", $tmp);'."\n";
+			$tplcontent .= '$tmp = preg_replace("/^<meta name=\"description\" content=\".*?\" \/>/ms", "<meta name=\"description\" content=\"" . dolPrintHTMLForAttribute(constant("__SEO_PAGE_DESC__")) . "\"  />", $tmp);'."\n";
 		}
 		if (empty($objectpage->lang)) {		// We may need to use param into the canonical url
-			$tplcontent .= 'defined("__SEO_CANONICAL_URL_PARAMS__") ? ($tmp = preg_replace("/__SEO_CANONICAL_URL_PARAMS__/", dol_string_nohtmltag(constant("__SEO_CANONICAL_URL_PARAMS__")), $tmp)) : ($tmp = preg_replace("/\?__SEO_CANONICAL_URL_PARAMS__\"/", "", preg_replace("/\?__SEO_CANONICAL_URL_PARAMS__&/", "?", $tmp)));'."\n";
+			$tplcontent .= 'defined("__SEO_CANONICAL_URL_PARAMS__") ? ($tmp = preg_replace("/__SEO_CANONICAL_URL_PARAMS__/", dolPrintHTMLForAttributeUrl(constant("__SEO_CANONICAL_URL_PARAMS__")), $tmp)) : ($tmp = preg_replace("/\?__SEO_CANONICAL_URL_PARAMS__\"/", "", preg_replace("/\?__SEO_CANONICAL_URL_PARAMS__&/", "?", $tmp)));'."\n";
 		}
 
 		$tplcontent .= "// Now output the generated page content\n";
