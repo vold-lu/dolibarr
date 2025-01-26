@@ -209,9 +209,9 @@ function dolSavePageContent($filetpl, Website $object, WebsitePage $objectpage, 
 
 		$listofaltlang = $object->otherlang;
 
-		// Add the link of the canonical reference
 		// Note: $object is website, $objectpage is website page
 		if ($object->virtualhost) {
+			// Add the link of the canonical reference
 			$canonicalurladdidlang = '';
 			if ($objectpage->lang) {	// A language is forced on the page, it means we may have other language files with hard links into properties of page
 				$canonicalurl = (($objectpage->id == $object->fk_default_home) ? '/' : (($shortlangcode != substr($object->lang, 0, 2) ? '/'.$shortlangcode : '').'/'.$objectpage->pageurl.'.php'));
@@ -219,10 +219,9 @@ function dolSavePageContent($filetpl, Website $object, WebsitePage $objectpage, 
 				$canonicalurl = '/'.$objectpage->pageurl.'.php';
 
 				if ($object->lang && $listofaltlang) {
-					$tmpshortlangcode = preg_replace('/[_-].*$/', '', $object->lang); // en_US or en-US -> en
 					// Add parameter ID required to be unique/canonical
 					$canonicalurladdidlang = '?__SEO_CANONICAL_URL_PARAMS__';
-					$canonicalurladdidlang .= '&l=<?php echo $weblangs->shortlang ? $weblangs->shortlang : "'.$tmpshortlangcode.'"; ?>';
+					$canonicalurladdidlang .= '&l=__SEO_CANONICAL_LANG__';
 				} else {
 					// Add parameter ID required to be unique/canonical
 					$canonicalurladdidlang = '?__SEO_CANONICAL_URL_PARAMS__';
@@ -348,6 +347,9 @@ function dolSavePageContent($filetpl, Website $object, WebsitePage $objectpage, 
 		}
 		if (empty($objectpage->lang)) {		// We may need to use param into the canonical url
 			$tplcontent .= 'defined("__SEO_CANONICAL_URL_PARAMS__") ? ($tmp = preg_replace("/__SEO_CANONICAL_URL_PARAMS__/", dolPrintHTMLForAttributeUrl(constant("__SEO_CANONICAL_URL_PARAMS__")), $tmp)) : ($tmp = preg_replace("/\?__SEO_CANONICAL_URL_PARAMS__\"/", "", preg_replace("/\?__SEO_CANONICAL_URL_PARAMS__&/", "?", $tmp)));'."\n";
+
+			$tmpshortlangcode = preg_replace('/[_-].*$/', '', $object->lang); // en_US or en-US -> en
+			$tplcontent .= '$tmp = preg_replace("/__SEO_CANONICAL_LANG__/", (defined("__SEO_PAGE_LANG__") ? preg_replace(\'/\[_-\].*$/\', "", constant("__SEO_PAGE_LANG__")) : (empty($weblangs->shortlang) ? "'.$tmpshortlangcode.'" : $weblangs->shortlang)), $tmp);'."\n";
 		}
 
 		$tplcontent .= "// Now output the generated page content\n";
