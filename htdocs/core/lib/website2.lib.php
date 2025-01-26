@@ -333,7 +333,8 @@ function dolSavePageContent($filetpl, Website $object, WebsitePage $objectpage, 
 		}
 		// New method for custom SEO
 		if (strpos($objectpage->content, 'define("__SEO_PAGE_LANG__"') !== false) {
-			$tplcontent .= '$tmp = preg_replace("/^<html lang=\"[a-z]+\"/ms", "<html lang=\"" . dolPrintHTMLForAttribute(constant("__SEO_PAGE_LANG__"), 1) . "\"", $tmp);'."\n";
+			$tmpshortlangcode = preg_replace('/[_-].*$/', '', $object->lang); // en_US or en-US -> en
+			$tplcontent .= '$tmp = preg_replace("/^<html lang=\"[a-z]+\"/ms", "<html lang=\"" . dolPrintHTMLForAttribute(defined("__SEO_PAGE_LANG__") ? preg_replace(\'/\[_-\].*$/\', "", constant("__SEO_PAGE_LANG__")) : (empty($weblangs->shortlang) ? "'.$tmpshortlangcode.'" : $weblangs->shortlang), 1) . "\"", $tmp);'."\n";
 		}
 		if (strpos($objectpage->content, 'define("__SEO_PAGE_KEYWORDS__"') !== false) {
 			$tplcontent .= '$tmp = preg_replace("/^<meta name=\"keywords\" content=\".*?\" \/>/ms", "<meta name=\"keywords\" content=\"" . dolPrintHTMLForAttribute(constant("__SEO_PAGE_KEYWORDS__"), 1) . "\"  />", $tmp);'."\n";
