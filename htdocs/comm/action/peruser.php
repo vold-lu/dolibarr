@@ -1348,7 +1348,9 @@ if (count($listofextcals)) {
 					$userstatic = new User($db);
 					$userId = $userstatic->findUserIdByEmail($namecal);
 					if (!empty($userId) && $userId > 0) {
-						$event->userassigned[$userId] = $userId;
+						$event->userassigned[$userId] = [
+							'id' => $userId,
+						];
 						$event->percentage = -1;
 					}
 
