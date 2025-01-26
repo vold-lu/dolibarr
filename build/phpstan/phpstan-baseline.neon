@@ -1885,12 +1885,6 @@ parameters:
 			path: ../../htdocs/admin/workstation.php
 
 		-
-			message: '#^Variable \$arrayofparameters might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../htdocs/admin/workstation.php
-
-		-
 			message: '#^Variable \$label might not be defined\.$#'
 			identifier: variable.undefined
 			count: 2
@@ -3721,12 +3715,6 @@ parameters:
 			path: ../../htdocs/comm/action/pertype.php
 
 		-
-			message: '#^Parameter \#3 \$status of function print_actions_filter expects int, array\<mixed\>\|string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../htdocs/comm/action/pertype.php
-
-		-
 			message: '#^Result of && is always false\.$#'
 			identifier: booleanAnd.alwaysFalse
 			count: 1
@@ -3757,18 +3745,6 @@ parameters:
 			path: ../../htdocs/comm/action/pertype.php
 
 		-
-			message: '#^Call to function is_array\(\) with array\{\} will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: ../../htdocs/comm/action/peruser.php
-
-		-
-			message: '#^If condition is always false\.$#'
-			identifier: if.alwaysFalse
-			count: 1
-			path: ../../htdocs/comm/action/peruser.php
-
-		-
 			message: '#^Loose comparison using \!\= between ''show_peruser'' and ''show_day'' will always evaluate to true\.$#'
 			identifier: notEqual.alwaysTrue
 			count: 1
@@ -3787,33 +3763,15 @@ parameters:
 			path: ../../htdocs/comm/action/peruser.php
 
 		-
-			message: '#^Loose comparison using \=\= between ''show_peruser'' and ''list'' will always evaluate to false\.$#'
-			identifier: equal.alwaysFalse
-			count: 1
-			path: ../../htdocs/comm/action/peruser.php
-
-		-
 			message: '#^Loose comparison using \=\= between ''show_peruser'' and ''show_day'' will always evaluate to false\.$#'
 			identifier: equal.alwaysFalse
 			count: 2
 			path: ../../htdocs/comm/action/peruser.php
 
 		-
-			message: '#^Loose comparison using \=\= between ''show_peruser'' and ''show_month'' will always evaluate to false\.$#'
-			identifier: equal.alwaysFalse
-			count: 1
-			path: ../../htdocs/comm/action/peruser.php
-
-		-
-			message: '#^Loose comparison using \=\= between ''show_peruser'' and ''show_peruser'' will always evaluate to true\.$#'
-			identifier: equal.alwaysTrue
-			count: 2
-			path: ../../htdocs/comm/action/peruser.php
-
-		-
 			message: '#^Loose comparison using \=\= between ''show_peruser'' and ''show_week'' will always evaluate to false\.$#'
 			identifier: equal.alwaysFalse
-			count: 2
+			count: 1
 			path: ../../htdocs/comm/action/peruser.php
 
 		-
@@ -3831,7 +3789,7 @@ parameters:
 		-
 			message: '#^Ternary operator condition is always true\.$#'
 			identifier: ternary.alwaysTrue
-			count: 10
+			count: 8
 			path: ../../htdocs/comm/action/peruser.php
 
 		-
@@ -3843,12 +3801,6 @@ parameters:
 		-
 			message: '#^Variable \$mode in empty\(\) always exists and is not falsy\.$#'
 			identifier: empty.variable
-			count: 2
-			path: ../../htdocs/comm/action/peruser.php
-
-		-
-			message: '#^Variable \$s might not be defined\.$#'
-			identifier: variable.undefined
 			count: 1
 			path: ../../htdocs/comm/action/peruser.php
 
@@ -31421,12 +31373,6 @@ parameters:
 			identifier: variable.undefined
 			count: 1
 			path: ../../htdocs/theme/eldy/dropdown.inc.php
-
-		-
-			message: '#^Parameter \#2 \$steps of function colorAdjustBrightness expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../htdocs/theme/eldy/global.inc.php
 
 		-
 			message: '#^Variable \$theme might not be defined\.$#'
