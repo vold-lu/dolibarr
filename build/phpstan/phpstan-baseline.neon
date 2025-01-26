@@ -31375,12 +31375,6 @@ parameters:
 			path: ../../htdocs/theme/eldy/dropdown.inc.php
 
 		-
-			message: '#^Parameter \#2 \$steps of function colorAdjustBrightness expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../htdocs/theme/eldy/global.inc.php
-
-		-
 			message: '#^Variable \$theme might not be defined\.$#'
 			identifier: variable.undefined
 			count: 22
