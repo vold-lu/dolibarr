@@ -3573,7 +3573,7 @@ function dol_check_secure_access_document($modulepart, $original_file, $entity, 
                     $accessallowed = 1;
                 }
             }
-            if (($fuser->hasRight($tmpmodule, $lire) || $fuser->hasRight($tmpmodule, $read)) || || preg_match('/^specimen/i', $original_file)) {
+            if (($fuser->hasRight($tmpmodule, $lire) || $fuser->hasRight($tmpmodule, $read)) || preg_match('/^specimen/i', $original_file)) {
                 $accessallowed = 1;
             }
 
