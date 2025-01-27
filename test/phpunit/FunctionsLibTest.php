@@ -1133,6 +1133,18 @@ class FunctionsLibTest extends CommonClassTest
 		$result = dol_escape_htmltag($input, 1);
 		$this->assertEquals('x&amp;&lt;b&gt;#&lt;/b&gt;,&quot;', $result);
 
+		$input = '<img alt="" src="https://github.githubassets.com/assets/GitHub%20Mark-ea2971cee799.png">';    // & and " are converted into html entities, <b> are not removed
+		$result = dol_escape_htmltag($input, 1, 1, 'common', 0, 1);
+		$this->assertEquals('<img alt="" src="https://github.githubassets.com/assets/GitHub%20Mark-ea2971cee799.png">', $result);
+
+		$input = '<img src="data:image/png;base64, 123/456+789==" style="height: 123px; width:456px">';    // & and " are converted into html entities, <b> are not removed
+		$result = dol_escape_htmltag($input, 1, 1, 'common');
+		$this->assertEquals('<img src="data:image/png;base64, 123/456+789==" style="height: 123px; width:456px">', $result);
+
+		$input = '<img src="data:image/png;base64, 123/456+789==" style="height: 123px; width:456px">';    // & and " are converted into html entities, <b> are not removed
+		$result = dol_escape_htmltag($input, 1);
+		$this->assertEquals('&lt;img src=&quot;data:image/png;base64, 123/456+789==&quot; style=&quot;height: 123px; width:456px&quot;&gt;', $result);
+
 		$input = '<img alt="" src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png">';    // & and " are converted into html entities, <b> are not removed
 		$result = dol_escape_htmltag($input, 1, 1, 'common', 0, 1);
 		$this->assertEquals('<img alt="" src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png">', $result);
