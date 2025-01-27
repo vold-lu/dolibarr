@@ -37,11 +37,7 @@ require_once DOL_DOCUMENT_ROOT.'/adherents/class/adherent_type.class.php';
 class Members extends DolibarrApi
 {
 	/**
-<<<<<<< HEAD
-	 * @var string[]   $FIELDS     Mandatory fields, checked when create and update object
-=======
 	 * @var string[]       Mandatory fields, checked when create and update object
->>>>>>> branch '20.0' of git@github.com:Dolibarr/dolibarr.git
 	 */
 	public static $FIELDS = array(
 		'morphy',
