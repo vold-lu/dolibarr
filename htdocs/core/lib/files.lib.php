@@ -3569,11 +3569,11 @@ function dol_check_secure_access_document($modulepart, $original_file, $entity, 
             $partsofdirinoriginalfile = explode('/', $original_file);
             if (!empty($partsofdirinoriginalfile[1])) {	// If original_file is xxx/filename (xxx is a part we will use)
                 $partofdirinoriginalfile = $partsofdirinoriginalfile[0];
-                if ($partofdirinoriginalfile && ($fuser->hasRight($tmpmodule, $partofdirinoriginalfile, 'lire') || $fuser->hasRight($tmpmodule, $partofdirinoriginalfile, 'read'))) {
+                if (($partofdirinoriginalfile && ($fuser->hasRight($tmpmodule, $partofdirinoriginalfile, 'lire') || $fuser->hasRight($tmpmodule, $partofdirinoriginalfile, 'read'))) || preg_match('/^specimen/i', $original_file)) {
                     $accessallowed = 1;
                 }
             }
-            if ($fuser->hasRight($tmpmodule, $lire) || $fuser->hasRight($tmpmodule, $read)) {
+            if (($fuser->hasRight($tmpmodule, $lire) || $fuser->hasRight($tmpmodule, $read)) || || preg_match('/^specimen/i', $original_file)) {
                 $accessallowed = 1;
             }
 
