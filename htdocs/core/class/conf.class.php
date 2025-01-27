@@ -4,7 +4,7 @@
  * Copyright (C) 2004-2020  Laurent Destailleur     <eldy@users.sourceforge.net>
  * Copyright (C) 2005-2017  Regis Houssin           <regis.houssin@inodbox.com>
  * Copyright (C) 2006 	    Jean Heimburger         <jean@tiaris.info>
- * Copyright (C) 2024       Frédéric France         <frederic.france@free.fr>
+ * Copyright (C) 2024-2025  Frédéric France         <frederic.france@free.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-
 
 /**
  *	\file       	htdocs/core/class/conf.class.php
@@ -1038,6 +1037,14 @@ class Conf extends stdClass
 				$this->global->MAIN_MAX_DECIMALS_SHOWN = 8;
 			}
 
+			// Non working days
+			if (!isset($this->global->MAIN_NON_WORKING_DAYS_INCLUDE_SATURDAY)) {
+				$this->global->MAIN_NON_WORKING_DAYS_INCLUDE_SATURDAY = 1;
+			}
+			if (!isset($this->global->MAIN_NON_WORKING_DAYS_INCLUDE_SUNDAY)) {
+				$this->global->MAIN_NON_WORKING_DAYS_INCLUDE_SUNDAY = 1;
+			}
+
 			// Default pdf option
 			if (!isset($this->global->MAIN_PDF_DASH_BETWEEN_LINES)) {
 				$this->global->MAIN_PDF_DASH_BETWEEN_LINES = 1; // use dash between lines
@@ -1197,10 +1204,10 @@ class Conf extends stdClass
 
 			// For modules that want to disable top or left menu
 			if (!empty($this->global->MAIN_HIDE_TOP_MENU)) {
-				$this->dol_hide_topmenu = getDolGlobalString('MAIN_HIDE_TOP_MENU');
+				$this->dol_hide_topmenu = getDolGlobalInt('MAIN_HIDE_TOP_MENU');
 			}
 			if (!empty($this->global->MAIN_HIDE_LEFT_MENU)) {
-				$this->dol_hide_leftmenu = getDolGlobalString('MAIN_HIDE_LEFT_MENU');
+				$this->dol_hide_leftmenu = getDolGlobalInt('MAIN_HIDE_LEFT_MENU');
 			}
 
 			if (empty($this->global->MAIN_SIZE_SHORTLIST_LIMIT)) {

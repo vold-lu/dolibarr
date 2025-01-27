@@ -1883,7 +1883,7 @@ class ActionComm extends CommonObject
 				$color = 'style="color: #'.$this->type_color.' !important;"';
 			}
 			if ($this->type_picto) {
-				$imgpicto = img_picto($titlealt.'rr', $this->type_picto, '', 0, 0, 0, '', ($morecss ? ' '.$morecss : ''));
+				$imgpicto = img_picto($titlealt, $this->type_picto, '', 0, 0, 0, '', ($morecss ? ' '.$morecss : ''));
 			} else {
 				if ($this->type_code == 'AC_RDV') {
 					$imgpicto = img_picto($titlealt, 'meeting', $color, 0, 0, 0, '', ($morecss ? ' '.$morecss : ''));
