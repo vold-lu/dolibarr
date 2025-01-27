@@ -1723,6 +1723,7 @@ CompressionOfResources=Compression of HTTP responses
 CompressionOfResourcesDesc=For example using the Apache directive "AddOutputFilterByType DEFLATE"
 TestNotPossibleWithCurrentBrowsers=Such an automatic detection is not possible with current browsers
 DefaultValuesDesc=Here you may define the default value you wish to use when creating a new record, and/or default filters or the sort order when you list records.
+DefaultValuesHelpText=You can use a single value or comma-separated values ​​for multiple choices. You can also use substitution tags (see list below).
 DefaultCreateForm=Default values (to use on forms)
 DefaultSearchFilters=Default search filters
 DefaultSortOrder=Default sort orders
