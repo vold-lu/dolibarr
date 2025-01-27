@@ -1098,7 +1098,7 @@ if ($user->hasRight("holiday", "read")) {
 			$event->transparency = 1;
 
 			$event->userownerid = $obj->uid; // user id of owner
-			$event->userassigned = array($obj->uid => $obj->uid);
+			$event->userassigned = array($obj->uid => array('id' => $obj->uid, 'transparency' => 1));
 
 			if ($obj->status == 3) {
 				// Show no symbol for leave with state "leave approved"
