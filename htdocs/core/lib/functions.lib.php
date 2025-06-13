@@ -12793,11 +12793,12 @@ function getElementProperties($elementType)
 		$table_element = 'projet_task';
 	} elseif ($elementType == 'facture' || $elementType == 'invoice') {
 		$classpath = 'compta/facture/class';
-		$module = 'facture';
+        $module = 'facture';
 		$subelement = 'facture';
 		$table_element = 'facture';
 	} elseif ($elementType == 'facturerec') {
 		$classpath = 'compta/facture/class';
+        $classfile = 'facture-rec';
 		$module = 'facture';
 		$classname = 'FactureRec';
 	} elseif ($elementType == 'commande' || $elementType == 'order') {
@@ -13064,6 +13065,7 @@ function fetchObjectByElement($element_id, $element_type, $element_ref = '', $us
 	$ret = 0;
 
 	$element_prop = getElementProperties($element_type);
+    var_dump($element_prop);
 
 	if ($element_prop['module'] == 'product' || $element_prop['module'] == 'service') {
 		// For example, for an extrafield 'product' (shared for both product and service) that is a link to an object,
@@ -13087,11 +13089,13 @@ function fetchObjectByElement($element_id, $element_type, $element_ref = '', $us
 		) {
 			return $conf->cache['fetchObjectByElement'][$element_type][$element_id];
 		}
+        var_dump('/'.$element_prop['classpath'].'/'.$element_prop['classfile'].'.class.php');
 
 		dol_include_once('/'.$element_prop['classpath'].'/'.$element_prop['classfile'].'.class.php');
 
 		if (class_exists($element_prop['classname'])) {
 			$className = $element_prop['classname'];
+
 			$objecttmp = new $className($db);
 			'@phan-var-force CommonObject $objecttmp';
 
